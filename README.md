@@ -28,6 +28,8 @@ The Items Model represents information about items available in a store or inven
 
 The Transaction Model captures information about transactions involving clients and items. It includes attributes such as `_id`, `client_id`, `rfid`, `items`, `total`, `timestamp`, `kg_price`, and `meal_price`. This model is tailored for `tracking purchases`, particularly in contexts where items can be weighed and priced by kilogram. The model's items field allows for listing multiple items in a transaction, and the total field calculates the overall transaction price. This model is well-suited for scenarios where clients make purchases, and the transaction involves both individual items and weighted products, providing a comprehensive overview of the transaction details.
 
+<img src="resources\APIs.png" alt="logo" style="zoom: 100%;" />
+
 ## 4. Folder structure
 
 Folder structure for the project:
