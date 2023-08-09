@@ -1,0 +1,56 @@
+# docker compose file to create the fastapi app and the mongodb database
+# to run the app, use the command: docker-compose up --build
+# to stop the app, use the command: docker-compose down
+
+version: "3.8"
+
+services:
+  main_db:
+    container_name: "main_db"
+    image: mongo
+    restart: always
+    ports:
+      - ${MONGO_DB_PORT}:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE_NAME: ${MONGO_INITDB_DATABASE_NAME}
+      MONGO_INITDB_USERNAME: ${MONGO_INITDB_USERNAME}
+      MONGO_INITDB_PASSWORD: ${MONGO_INITDB_PASSWORD}
+    env_file:
+      - .env
+    volumes:
+      - ./data/main_db:/data/db
+    networks:
+      - main_network
+
+  client_server:
+    build:
+      context: ./server/
+      dockerfile: Dockerfile
+    container_name: server
+    command: "uvicorn main:app --host 0.0.0.0 --port 80"
+    depends_on:
+      - main_db
+    environment:
+      CLIENT_DB_HOST: ${CLIENT_DB_HOST}
+      CLIENT_DB_PORT: ${MONGO_DB_PORT}
+      CLIENT_DB_NAME: ${CLIENT_DB_NAME}
+      MONGO_DB_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_DB_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      CLIENTS_COLLECTION_NAME: ${CLIENTS_COLLECTION_NAME}
+      ITEMS_COLLECTION_NAME: ${ITEMS_COLLECTION_NAME}
+      TRANSACTIONS_COLLECTION_NAME: ${TRANSACTIONS_COLLECTION_NAME}
+    volumes:
+      - ./server/:/app
+    env_file:
+      - .env
+    ports:
+      - ${SERVER_PORT}:80
+    restart: always
+    networks:
+      - main_network
+
+networks:
+  main_network:
+    driver: bridge
