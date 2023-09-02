@@ -1,0 +1,10 @@
+*.pyc
+*.swp
+www/codigo_barras/*.png
+www/codigo_barras/*.jpeg
+trace/*
+logs/*
+despachador_email/trace/*
+despachador-de-email/trace/*
+server/logs/*
+almoco/logs/*

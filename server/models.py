@@ -51,12 +51,14 @@ class Clients(BaseModel):
                       example="John Doe")
     email: str = Field(..., description="Email of the client",
                        example="johndoe@example.com")
-    cpf: constr(min_length=11, max_length=11) = Field(...,
+    cpf: constr(min_length=11, max_length=11) = Field("",
                                                       description="CPF of the client", example="12345678901")
     rfid: str = Field(None, description="RFID of the client",
                       example="RFID123")
     qrcode: str = Field(None,
                         description="QR code of the client", example="QR123")
+    group: str = Field("regular", description="Group of the client",
+                       example="regular")
     phone: str = Field(
         "", description="Phone number of the client", example="555-123-4567")
     address: str = Field(
@@ -67,11 +69,11 @@ class Clients(BaseModel):
     created_at: str = Field(
         datetime.now().isoformat(), description="Timestamp when the client was created", example=datetime.now().isoformat())
 
-    @validator("cpf")
-    def validate_cpf_length(cls, v):
-        if len(v) != 11:
-            raise ValueError("CPF must have exactly 11 digits")
-        return v
+    # @validator("cpf")
+    # def validate_cpf_length(cls, v):
+    #     if len(v) != 11:
+    #         raise ValueError("CPF must have exactly 11 digits")
+    #     return v
 
     @validator("email")
     def validate_email(cls, v):
@@ -114,7 +116,8 @@ class Clients(BaseModel):
                 "phone": "(48)99-987-1234",
                 "address": "Rua XXX, 123",
                 "cep": "79311-571",
-                "balance": 0.0
+                "balance": 0.0,
+                "group": "regular"
             }
         }
 
@@ -201,14 +204,21 @@ class Transaction(BaseModel):
     _id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     client_id: str = Field(
         "", description="Unique ID of the client", example="123456")
+    client_name: str = Field(
+        "", description="Name of the client", example="John Doe")
+    client_email: str = Field(
+        "", description="Email of the client", example="jhondoe@email.com")
     rfid: str = Field(
         "", description="RFID of the client", example="RFID123")
-    items: List[dict] = Field(..., description="List of items in the transaction and their prices", example=[{"item_id": "Item 1", "quantity": 1}, {
-        "item_id": "Item 2", "quantity": 2}])
+    items: List[dict] = Field(..., description="List of items in the transaction and their prices",
+                              example=[{"item_id": "Item 1", "quantity": 1}, {
+                                  "item_id": "Item 2", "quantity": 2}])
     total: float = Field(0, description="Total price of the transaction",
                          example=4.98)
     timestamp: str = Field(datetime.now().isoformat(
     ), description="Timestamp when the transaction was created", example=datetime.now().isoformat())
+    transaction_type: str = Field(
+        "sell", description="Type of the transaction", example="buy")
 
     # current_weight: float = Field(
     #     0, description="Current weight of the dish", example=0.0)
@@ -235,21 +245,15 @@ class Transaction(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "client_id": "123456",
-                "rfid": "RFID123",
-                "items": [{"item_id": "Item 1", "quantity": 1}, {"item_id": "Item 2", "quantity": 2}],
-                # "current_weight": 0.0,
-                "kg_price": 0.0
+                "client_id": "64d2f0cd47614dfdea47e246",
+                "rfid": "333907a32a974752869d7022183d6608",
+                "type": "buy",
+                "items": [
+                    {
+                        "item_id": "64e8b1ea5bfcceebd893d707",
+                        "quantity": 5
+                    }
+                ],
+                "kg_price": 0
             }
         }
-
-
-'''
-Notes about the models:
-
-Field(...): This indicates that the field is required and doesn't have a default value. It's a way of explicitly marking that the field must be provided when creating an instance of the Pydantic model.
-Field(None): This indicates that the field is optional and can have a value of None. It's often used for fields that might not always have a value.
-Field(default_value): This allows you to specify a default value for the field, which will be used if the field is not explicitly provided when creating an instance of the model.
-Field(..., description="..."): You can provide a description for the field using the description parameter. This description can help provide context and documentation for the field.
-Field(..., example="..."): The example parameter allows you to provide an example value for the field. This can be useful for documentation and testing purposes.
-'''

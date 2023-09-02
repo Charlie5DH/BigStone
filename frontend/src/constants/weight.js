@@ -1,0 +1,4 @@
+export const GET_KG_PRICE = "GET_KG_PRICE";
+export const UPDATE_KG_PRICE = "UPDATE_KG_PRICE";
+export const LOADING_KG_PRICE = "LOADING_KG_PRICE";
+export const END_LOADING_KG_PRICE = "END_LOADING_KG_PRICE";

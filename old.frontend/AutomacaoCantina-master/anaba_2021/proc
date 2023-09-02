@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# funde as listas em um único arquivo
+# for d in `ls lista*.csv`; do awk NR\>1 $d >>  comp.csv ; done
+
+# remove o \n no comp.csv (usa a ferramenta de replace do proprio exccel
+
+
+cab="cliente_id,cliente_tipo,cliente_matricula,cliente_nome,cliente_familia,cliente_ano,cliente_pais_1,cliente_pais_2,cliente_email_1,cliente_email_2,cliente_telefone_1,cliente_telefone_2,cliente_telefone_3,cliente_telefone_4,cliente_telefone_5,cliente_telefone_6,cliente_telefone_7,cliente_telefone_8,cliente_telefone_9,cliente_data"
+
+cat $1 | awk -F\; '{ 
+  cliente_id=NR
+  cliente_tipo="Aluno"
+  cliente_matricula=$1
+  cliente_nome=$2
+  cliente_familia=$2
+  cliente_ano=""
+  cliente_pais_1=$3
+  cliente_pais_2=$5
+  cliente_telefone_1 = cliente_telefone_2 = cliente_telefone_3 = cliente_telefone_4 = cliente_telefone_5 = cliente_telefone_6 = cliente_telefone_7 = cliente_telefone_8 = cliente_telefone_9 = ""
+
+  split($4,C,"|")
+  for(i=0; i < length(C); i++) { 
+    if (match(C[i], "@")) 
+      cliente_email_1=C[i] 
+  }
+
+  split($6,C,"|")
+  for(i=0; i < length(C); i++) { 
+    if (match(C[i], "@")) 
+      cliente_email_2=C[i] 
+  }
+  cliente_data=""
+  print cliente_id "," cliente_tipo "," cliente_matricula "," cliente_nome "," cliente_familia "," cliente_ano "," cliente_pais_1 "," cliente_pais_2 "," cliente_email_1 "," cliente_email_2 "," cliente_telefone_1 "," cliente_telefone_2 "," cliente_telefone_3 "," cliente_telefone_4 "," cliente_telefone_5 "," cliente_telefone_6 "," cliente_telefone_7 "," cliente_telefone_8 "," cliente_telefone_9 "," cliente_data
+}'

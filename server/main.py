@@ -1,18 +1,19 @@
 import os
 import pymongo
 import json
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from datetime import datetime
+from datetime import timedelta
 from fastapi import FastAPI, HTTPException, status, APIRouter
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, Response, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from bson.objectid import ObjectId
 from typing import Optional, List
 from models import Clients, Item, Transaction
-from utils import convert_object_id
-
-from database import get_clients_collection, get_items_collection, get_transactions_collection
+from utils import convert_object_id, get_init_and_end_timestamp_from_period
+from typing import Annotated
+from database import get_clients_collection, get_items_collection, get_transactions_collection, get_weights_collection, get_kg_price_collection
 
 app = FastAPI(title="Main Server")
 
@@ -27,8 +28,24 @@ app.add_middleware(
 clients_collection = get_clients_collection()
 items_collection = get_items_collection()
 transactions_collection = get_transactions_collection()
+weights_collection = get_weights_collection()
+kg_price_collection = get_kg_price_collection()
 
 CURRENT_WEIGHT = 0
+KG_PRICE = 0
+
+# intialize the server and get the last kg price in the database
+# check if the kg_price collection is empty
+if kg_price_collection.count_documents({}) == 0:
+    # if it is empty, create a new kg_price document with the default value of 0
+    kg_price_collection.insert_one(
+        {"kg_price": 0, "timestamp": datetime.now().isoformat()})
+    KG_PRICE = 0
+else:
+    # if it is not empty, get the last kg_price in the database
+    last_kg_price = kg_price_collection.find_one(
+        sort=[("timestamp", pymongo.DESCENDING)])
+    KG_PRICE = last_kg_price["kg_price"]
 
 
 @app.get("/test")
@@ -37,7 +54,36 @@ async def test():
     return {"message": "OK"}
 
 
-@app.post("/api/create_client/", tags=["clients"])
+@app.get("/api/get_image/{filename}")
+async def get_image(filename: str):
+    ''' API for getting an image from the assets folder
+
+    Attributes:
+        filename(str): Filename of the image.
+    '''
+
+    if not os.path.exists(f"app/assets/{filename}"):
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    return FileResponse(f"app/assets/{filename}")
+
+
+@app.post("/api/upload_image")
+async def create_upload_file(file: UploadFile | None = None):
+    '''
+    API for uploading an image to an item
+    '''
+    if not file:
+        return {"message": "No upload file sent"}
+    else:
+        # save file in local storage (assets folder)
+        with open((f"app/assets/{file.filename}"), "wb") as buffer:
+            buffer.write(file.file.read())
+
+        return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Image uploaded successfully", "filename": file.filename})
+
+
+@app.post("/api/create_clients", tags=["clients"])
 async def create_client(client: Clients):
     ''' API for creating a new client:
 
@@ -69,13 +115,13 @@ async def create_client(client: Clients):
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=json.loads(json.dumps(created_client, default=convert_object_id)))
 
 
-@app.get("/api/get_clients/", tags=["clients"])
+@app.get("/api/clients/", tags=["clients"])
 async def get_clients():
     clients = list(clients_collection.find())
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(clients, default=convert_object_id)))
 
 
-@app.get("/api/get_client/{client_id}", tags=["clients"])
+@app.get("/api/client/{client_id}", tags=["clients"])
 async def get_client(client_id: str):
     client_data = clients_collection.find_one({"_id": ObjectId(client_id)})
     if client_data is None:
@@ -83,7 +129,7 @@ async def get_client(client_id: str):
     return client_data
 
 
-@app.put("/api/update_client/{client_id}", tags=["clients"])
+@app.put("/api/client/{client_id}", tags=["clients"])
 async def update_client(client_id: str, client: dict):
 
     ''' API for updating a client:
@@ -101,10 +147,71 @@ async def update_client(client_id: str, client: dict):
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(updated_client, default=convert_object_id)))
 
 
-@app.delete("/api/delete_client/{client_id}", tags=["clients"])
+@app.delete("/api/client/{client_id}", tags=["clients"])
 async def delete_client(client_id: str):
     clients_collection.delete_one({"_id": ObjectId(client_id)})
     return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Client deleted successfully", "client_id": client_id})
+
+
+@app.delete("/api/clients/{ids}", tags=["clients"])
+async def delete_many_clients(ids: str):
+
+    if type(ids) is list:
+        pass
+    elif type(ids) is str:
+        if '[' in ids:
+            ids = json.loads(ids)
+        else:
+            ids = [ids]
+    else:
+        raise TypeError('Field "ids" needs to be an id or a list of ids')
+
+    clients_collection.delete_many(
+        {"_id": {"$in": [ObjectId(id) for id in ids]}})
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Clients deleted successfully", "client_ids": ids})
+
+
+@app.put("/api/clients/clear_debt/{client_ids}", tags=["clients"])
+async def clear_debt(client_ids: str):
+
+    if type(client_ids) is list:
+        pass
+    elif type(client_ids) is str:
+        if '[' in client_ids:
+            client_ids = json.loads(client_ids)
+        else:
+            client_ids = [client_ids]
+    else:
+        raise TypeError(
+            'Field "client_ids" needs to be an id or a list of ids')
+
+    clients = list(clients_collection.find(
+        {"_id": {"$in": [ObjectId(id) for id in client_ids]}}))
+
+    clients_collection.update_many(
+        {"_id": {"$in": [ObjectId(id) for id in client_ids]}}, {"$set": {"balance": 0}})
+    updated_clients = list(clients_collection.find(
+        {"_id": {"$in": [ObjectId(id) for id in client_ids]}}))
+
+    # create a transaction for each client to clear their debt
+    for client in clients:
+        transaction = {
+            "client_name": client["name"],
+            "client_email": client["email"],
+            "rfid": client["rfid"],
+            "client_id": client["_id"],
+            "transaction_type": "clear_debt",
+            "items": [],
+            "total": client["balance"] * -1,
+            "timestamp": datetime.now().isoformat(),
+            "kg_price": 0,
+            "meal_price": 0,
+            "weight": 0
+        }
+        transactions_collection.insert_one(transaction)
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(updated_clients, default=convert_object_id)))
+
 
 ##########################################################################################
 # REMOTE
@@ -137,9 +244,15 @@ async def current_dish_weight(weight: float):
         weight(float): Current weight of the dish.
 
     The weight field is used to identify the current weight of the dish.
+
+    Save the current weight in the database for future reference
     '''
     global CURRENT_WEIGHT
     CURRENT_WEIGHT = weight
+
+    # save the current weight in the database for future reference
+    weights_collection.insert_one(
+        {"weight": weight, "timestamp": datetime.now().isoformat()})
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(weight, default=convert_object_id)))
 
@@ -150,20 +263,107 @@ async def get_current_weight():
 
     The weight field is used to identify the current weight of the dish.
     '''
+    # # get the last weight in the database
+    # last_weight = weights_collection.find_one(
+    #     sort=[("timestamp", pymongo.DESCENDING)])
+    # if last_weight is None:
+    #     raise HTTPException(status_code=404, detail="Weight not found")
+
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps({"weight": CURRENT_WEIGHT}, default=convert_object_id)))
+
+
+@app.post("/api/kg_price/{kg_price}", tags=["price"])
+async def kg_price(kg_price: float):
+    ''' API for getting the price per kilogram of the dish
+
+    Attributes:
+        kg_price(float): Price per kilogram of the dish.
+
+    The kg_price field is used to identify the price per kilogram of the dish.
+    '''
+    global KG_PRICE
+    KG_PRICE = kg_price
+
+    # save the current kg_price in the database for future reference
+    kg_price_collection.insert_one(
+        {"kg_price": kg_price, "timestamp": datetime.now().isoformat()})
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(kg_price, default=convert_object_id)))
+
+
+@app.get("/api/get_kg_price", tags=["price"])
+async def get_kg_price():
+    ''' API for getting the price per kilogram of the dish
+
+    The kg_price field is used to identify the price per kilogram of the dish.
+    '''
+    return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps({"kg_price": KG_PRICE}, default=convert_object_id)))
+
 
 ##########################################################################################
 # Items API
 ##########################################################################################
 
 
-@app.get("/api/items/", tags=["items"])
-async def get_items():
+@app.get("/api/items/{sold_this_month}/{period}", tags=["items"])
+async def get_items(sold_this_month: bool = False, period: int = 30):
     '''
     API for getting all items in the database
+
+    Appends a field called "sold_this_month", "sold_this_week", "sold_today" to each item with the total 
+    quantity of the item sold in the last month, week and day respectively.
     '''
 
     items = list(items_collection.find())
+
+    transaction_type = "sell"
+    if transaction_type == "all":
+        filter_for_transaction_type = {}
+    else:
+        filter_for_transaction_type = {"transaction_type": transaction_type}
+
+    # if sold_this_month is True, append the sold_this_month field to each item
+    # we must take the transactions of the current month and sum the quantity of each item
+    if sold_this_month:
+        for item in items:
+            # get the transactions of the current month
+            start_timestamp = (
+                datetime.now() - timedelta(days=period)).isoformat()
+            end_timestamp = datetime.now().isoformat()
+            transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": start_timestamp}}, {
+                "timestamp": {"$lte": end_timestamp}}, filter_for_transaction_type]}))
+
+            # get the transactions that contain the current item
+            transactions_with_item = []
+            for transaction in transactions:
+                for item_in_transaction in transaction["items"]:
+                    if item_in_transaction["item_id"] == str(item["_id"]):
+                        transactions_with_item.append(transaction)
+
+            # sum the quantity of the item in each transaction
+            sold_this_month = 0
+            sold_this_week = 0
+            sold_today = 0
+            for transaction in transactions_with_item:
+                for item_in_transaction in transaction["items"]:
+                    if item_in_transaction["item_id"] == str(item["_id"]):
+                        sold_this_month += item_in_transaction["quantity"]
+
+                        # check if the transaction was made in the last week
+                        if datetime.now() - timedelta(days=7) <= datetime.fromisoformat(transaction["timestamp"]) <= datetime.now():
+                            sold_this_week += item_in_transaction["quantity"]
+
+                            # check if the transaction was made today
+                            if datetime.now() - timedelta(days=1) <= datetime.fromisoformat(transaction["timestamp"]) <= datetime.now():
+                                sold_today += item_in_transaction["quantity"]
+
+            item["sold_this_month"] = sold_this_month
+            item["sold_this_week"] = sold_this_week
+            item["sold_today"] = sold_today
+
+    # return the items sorted by name
+    items = sorted(items, key=lambda item: item["name"])
+
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(items, default=convert_object_id)))
 
 
@@ -189,6 +389,61 @@ async def create_item(item: Item):
     created_item = items_collection.find_one({"_id": result.inserted_id})
 
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=json.loads(json.dumps(created_item, default=convert_object_id)))
+
+
+@app.post("/api/items/many", tags=["items"])
+async def create_many_items(items: List[Item]):
+    '''
+    API for creating many items at once
+
+    Attributes:
+        items(List[Item]): List of items to be created.
+    '''
+
+    items_dict = [item.__dict__ for item in items]
+    result = items_collection.insert_many(items_dict)
+
+    created_items = list(items_collection.find(
+        {"_id": {"$in": result.inserted_ids}}))
+
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=json.loads(json.dumps(created_items, default=convert_object_id)))
+
+
+@app.post("/api/items/upload_image/{item_id}", tags=["images"])
+async def create_upload_file(file: UploadFile | None = None, item_id: str = None):
+    '''
+    API for uploading an image to an item
+    '''
+    if not file:
+        return {"message": "No upload file sent"}
+    else:
+        # save file in local storage (assets folder)
+        with open((f"app/assets/{file.filename}"), "wb") as buffer:
+            buffer.write(file.file.read())
+
+        # update item image
+        items_collection.update_one(
+            {"_id": ObjectId(item_id)}, {"$set": {"image": file.filename}})
+        updated_item = items_collection.find_one({"_id": ObjectId(item_id)})
+
+        return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(updated_item, default=convert_object_id)))
+
+
+@app.get("/api/items/image/{item_id}", tags=["images"])
+async def get_item_image(item_id: str):
+    '''
+    API for getting the image of an item
+
+    Attributes:
+        item_id(str): Unique ID of the item.
+    '''
+
+    item_data = items_collection.find_one({"_id": ObjectId(item_id)})
+    if item_data is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    if item_data["image"] is None:
+        raise HTTPException(status_code=404, detail="Item image not found")
+    return FileResponse(f"app/assets/{item_data['image']}")
 
 
 @app.get("/api/items/{item_id}", tags=["items"])
@@ -228,16 +483,20 @@ async def update_item(item_id: str, item: dict):
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(updated_item, default=convert_object_id)))
 
 
-@app.put("/api/items/{item_id}/quantity", tags=["items"], description="Update the quantity of an item")
-async def update_item_quantity(item_id: str, quantity: int):
+@app.put("/api/items/{item_id}/quantity/{quantity}", tags=["items"], description="Update the quantity of an item")
+async def update_item_quantity(item_id: str, quantity: int, user: dict):
     '''
     API for updating the quantity of an item
+
+    The update must generate a transaction of type "stock" with the difference between the old and the new quantity
 
     Attributes:
         item_id(str): Unique ID of the item.
         quantity(int): New quantity of the item.
-
+        user(dict): Dictionary containing the current user data.
     '''
+
+    original_item = items_collection.find_one({"_id": ObjectId(item_id)})
 
     items_collection.update_one(
         {"_id": ObjectId(item_id)}, {"$set": {"quantity": quantity}})
@@ -245,6 +504,28 @@ async def update_item_quantity(item_id: str, quantity: int):
 
     if updated_item is None:
         raise HTTPException(status_code=404, detail="Item not found")
+
+    # create a transaction of type "stock" with the difference between the old and the new quantity
+    transaction = {
+        "client_name": user["name"],
+        "client_email": user["email"],
+        "client_id": user["_id"],
+        "transaction_type": "stock",
+        "items": [
+            {
+                "item_id": item_id,
+                "quantity": quantity - original_item["quantity"],
+                "name": original_item["name"],
+                "price": original_item["price"]
+            }
+        ],
+        "total": original_item["price"] * (quantity - original_item["quantity"]),
+        "timestamp": datetime.now().isoformat(),
+        "kg_price": 0,
+        "meal_price": 0,
+        "weight": 0,
+    }
+    transactions_collection.insert_one(transaction)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(updated_item, default=convert_object_id)))
 
@@ -280,7 +561,7 @@ async def subtract_item_quantity(item_id: str, quantity: int, subtract: bool = T
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(updated_item, default=convert_object_id)))
 
 
-@app.delete("/api/items/{item_id}", tags=["items"])
+@app.delete("/api/item/{item_id}", tags=["items"])
 async def delete_item(item_id: str):
     '''
     API for deleting an item
@@ -291,6 +572,24 @@ async def delete_item(item_id: str):
 
     items_collection.delete_one({"_id": ObjectId(item_id)})
     return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Item deleted successfully", "item_id": item_id})
+
+
+@app.delete("/api/items/{ids}", tags=["items"])
+async def delete_many_items(ids: str):
+
+    if type(ids) is list:
+        pass
+    elif type(ids) is str:
+        if '[' in ids:
+            ids = json.loads(ids)
+        else:
+            ids = [ids]
+    else:
+        raise TypeError('Field "ids" needs to be an id or a list of ids')
+
+    items_collection.delete_many(
+        {"_id": {"$in": [ObjectId(id) for id in ids]}})
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Items deleted successfully", "item_ids": ids})
 
 
 @app.put("/api/items/", tags=["items"], description="Update many items at once")
@@ -318,17 +617,32 @@ async def update_many_items(ids: List[str], item: dict):
 # Transaction API
 ##########################################################################################
 
-@app.get("/api/transactions", tags=["transactions"])
-async def get_transactions():
+@app.get("/api/transactions/{transaction_type}", tags=["transactions"])
+async def get_transactions(transaction_type: str, start_timestamp: str = None, end_timestamp: str = None, limit: int = 0, skip: int = 0):
     '''
     API for getting all transactions
+
+    Filter transactions by type: "sell", "stock", "clear_debt", "all"
     '''
 
-    transactions = list(transactions_collection.find())
+    if transaction_type == "all":
+        filter_for_transaction_type = {}
+    else:
+        filter_for_transaction_type = {"transaction_type": transaction_type}
+
+    if start_timestamp is not None and end_timestamp is not None:
+        start_timestamp = datetime.fromisoformat(start_timestamp)
+        end_timestamp = datetime.fromisoformat(end_timestamp)
+        transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": start_timestamp}}, {
+            "timestamp": {"$lte": end_timestamp}}, filter_for_transaction_type]}).skip(skip).limit(limit).sort("timestamp", pymongo.DESCENDING))
+    else:
+        transactions = list(
+            transactions_collection.find(filter_for_transaction_type).skip(skip).limit(limit).sort("timestamp", pymongo.DESCENDING))
+
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(transactions, default=convert_object_id)))
 
 
-@app.get("/api/transactions/{transaction_id}", tags=["transactions"])
+@app.get("/api/transaction/{transaction_id}", tags=["transactions"])
 async def get_transaction(transaction_id: str):
     '''
     API for getting a specific transaction
@@ -361,29 +675,34 @@ async def get_transaction_items(transaction_id: str):
 
 
 # get transactions by client_id or rfid
-@app.get("/api/transactions/client", tags=["transactions"])
-async def get_transactions_by_client(client_id: str = None, rfid: str = None):
+@app.get("/api/transactions/client/{client_id}/period/{period}", tags=["transactions"])
+async def get_transactions_by_client(client_id, period: str = "Hoje"):
     '''
-    API for getting all transactions of a specific client
+    Get the transactions of a specific client in a specific period of time.
+
+    Periods: "Hoje", "Ontem", "Últimos 7 dias", "Últimos 30 dias", "3 Mêses", "Selecione um período"
 
     Attributes:
         client_id(str): Unique ID of the client.
-        rfid(str): RFID of the client.
     '''
+    transaction_type = "sell"
+
+    if transaction_type == "all":
+        filter_for_transaction_type = {}
+    else:
+        filter_for_transaction_type = {"transaction_type": transaction_type}
+
+    start_timestamp, end_timestamp = get_init_and_end_timestamp_from_period(
+        period)
 
     if client_id is not None:
-        transactions = list(transactions_collection.find(
-            {"client_id": client_id}))
-    elif rfid is not None:
-        transactions = list(
-            transactions_collection.find({"client_rfid": rfid}))
+        transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": start_timestamp}}, {
+            "timestamp": {"$lte": end_timestamp}}, {"client_id": client_id}, filter_for_transaction_type]}))
     else:
         raise HTTPException(
-            status_code=400, detail="Either client_id or rfid must be provided")
+            status_code=400, detail="client_id must be provided")
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(transactions, default=convert_object_id)))
-
-# get transaction from a timestamp range
 
 
 @app.get("/api/transactions/timestamp", tags=["transactions"])
@@ -403,9 +722,16 @@ async def get_transactions_by_timestamp(start_timestamp: str, end_timestamp: str
     start_timestamp = datetime.fromisoformat(start_timestamp)
     end_timestamp = datetime.fromisoformat(end_timestamp)
 
+    transaction_type = "sell"
+
+    if transaction_type == "all":
+        filter_for_transaction_type = {}
+    else:
+        filter_for_transaction_type = {"transaction_type": transaction_type}
+
     if transaction_id is not None:
         transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": start_timestamp}}, {
-            "timestamp": {"$lte": end_timestamp}}, {"_id": ObjectId(transaction_id)}]}))
+            "timestamp": {"$lte": end_timestamp}}, {"_id": ObjectId(transaction_id)}, filter_for_transaction_type]}))
     else:
         transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": start_timestamp}}, {
             "timestamp": {"$lte": end_timestamp}}]}))
@@ -437,6 +763,7 @@ async def create_transaction(transaction: Transaction):
     Example:
         {
             "rfid": "333907a32a974752869d7022183d6608",
+            "transaction_type": "sell",
             "items": [
                 {
                 "item_id": "64d2d745df6f0cfeed2cb223",
@@ -453,6 +780,10 @@ async def create_transaction(transaction: Transaction):
     # if both rfid and client_id are provided, check if they match
     # if only client_id is provided, update the transaction_dict with the rfid
 
+    # if the kg_price is not provided, use the default KG_PRICE
+    if transaction_dict["kg_price"] is None:
+        transaction_dict["kg_price"] = KG_PRICE
+
     client = None
 
     if transaction_dict["rfid"] is not None:
@@ -461,6 +792,8 @@ async def create_transaction(transaction: Transaction):
         if client is None:
             raise HTTPException(status_code=404, detail="Client not found")
         transaction_dict["client_id"] = str(client["_id"])
+        transaction_dict["client_name"] = str(client["name"])
+        transaction_dict["client_email"] = str(client["email"])
     elif transaction_dict["client_id"] is not None:
         client = clients_collection.find_one(
             {"_id": ObjectId(transaction_dict["client_id"])})
@@ -473,6 +806,7 @@ async def create_transaction(transaction: Transaction):
 
     # calculate total price of the transaction based on the items
     # check if items exist and if item is in stock
+
     transaction_dict["total"] = 0
     for item in transaction_dict["items"]:
         item_db = items_collection.find_one({"_id": ObjectId(item["item_id"])})
@@ -552,3 +886,384 @@ async def delete_transaction(transaction_id: str):
         {"_id": ObjectId(transaction_id)})
 
     return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Transaction deleted successfully"})
+
+
+@app.get("/api/transactions/summary/{period}", tags=["transactions"])
+async def get_transactions_summary(period: str, start_timestamp: str = None, end_timestamp: str = None, limit: int = 0, skip: int = 0):
+    '''
+    Return a summary of transactions in a specific period of time.
+    - Total sells
+    - Total made
+    - Total by meal
+    - Total by item
+    - Items sold
+    - More selled items
+    - Clients with more transactions
+    - Clients that spent more money
+
+    Periods: "Hoje", "Ontem", "Últimos 7 dias", "Últimos 30 dias", "3 Mêses", "Selecione um período"
+    '''
+
+    transaction_type = "sell"
+
+    if transaction_type == "all":
+        filter_for_transaction_type = {}
+    else:
+        filter_for_transaction_type = {"transaction_type": transaction_type}
+
+    start_timestamp, end_timestamp = get_init_and_end_timestamp_from_period(
+        period)
+
+    transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": start_timestamp}}, {
+        "timestamp": {"$lte": end_timestamp}}, filter_for_transaction_type]}).skip(skip).limit(limit))
+
+    # total sells
+    total_sells = len(transactions)
+
+    # summary
+    total_made = 0
+    total_by_meal = 0
+    total_by_item = 0
+    items_sold = 0
+    more_selled_items_in_period = []
+    clients_with_more_transactions = []
+    clients_that_spent_more_money = []
+
+    for transaction in transactions:
+        total_made += transaction["total"]
+        total_by_meal += transaction["meal_price"]
+        total_by_item += transaction["total"] - transaction["meal_price"]
+        items_sold += len(transaction["items"])
+
+        # more selled items of the period
+        # create a dictionary with the item_id, the amount sold and the total made
+        for item in transaction["items"]:
+            item_in_period = next(
+                (item_period for item_period in more_selled_items_in_period if item_period["item_id"] == item["item_id"]), None)
+            if item_in_period is None:
+                more_selled_items_in_period.append(
+                    {"item_id": item["item_id"], "quantity": item["quantity"], "price": item["price"], "total": item["quantity"] * item["price"]})
+            else:
+                item_in_period["quantity"] += item["quantity"]
+                item_in_period["total"] += item["quantity"] * item["price"]
+
+        # clients with more transactions and how much they spent
+        client_in_period = next(
+            (client_period for client_period in clients_with_more_transactions if client_period["client_id"] == transaction["client_id"]), None)
+        if client_in_period is None:
+            clients_with_more_transactions.append(
+                {"client_id": transaction["client_id"], "transactions": 1, "total": transaction["total"], "name": transaction["client_name"], "email": transaction["client_email"]})
+        else:
+            client_in_period["transactions"] += 1
+            client_in_period["total"] += transaction["total"]
+
+        # clients that spent more money
+        client_in_period = next(
+            (client_period for client_period in clients_that_spent_more_money if client_period["client_id"] == transaction["client_id"]), None)
+        if client_in_period is None:
+            clients_that_spent_more_money.append(
+                {"client_id": transaction["client_id"], "total": transaction["total"], "name": transaction["client_name"], "email": transaction["client_email"]})
+        else:
+            client_in_period["total"] += transaction["total"]
+
+    # sort the items by quantity
+    more_selled_items_in_period.sort(
+        key=lambda item: item["quantity"], reverse=True)
+    # get the first 5 items
+    more_selled_items = more_selled_items_in_period[:5]
+
+    # sort the clients by transactions
+    clients_with_more_transactions.sort(
+        key=lambda client: client["transactions"], reverse=True)
+    # get the first 5 clients
+    clients_with_more_transactions = clients_with_more_transactions[:5]
+
+    # sort the clients by total
+    clients_that_spent_more_money.sort(
+        key=lambda client: client["total"], reverse=True)
+    # get the first 5 clients
+    clients_that_spent_more_money = clients_that_spent_more_money[:5]
+
+    # --------------------------------------------------------------------------------------------------------
+    # create a daily summary of transactions which will be returned in the format
+    # {"2021-05-01": {"total_sells": 1, "total_made": 10, "total_by_meal": 5, "total_by_item": 5, "items_sold": 1, clients_with_more_transactions": [], "clients_that_spent_more_money": []}}
+    # the key is the date in isoformat
+    # the value is a dictionary with the summary of the transactions of that day
+
+    # get the first day of the period
+    start_date = datetime.fromisoformat(start_timestamp).replace(
+        hour=0, minute=0, second=0, microsecond=0)
+    # get the last day of the period
+    end_date = datetime.fromisoformat(end_timestamp).replace(
+        hour=23, minute=59, second=59, microsecond=999999)
+    # get the number of days in the period
+    days = (end_date - start_date).days + 1
+    # create a dictionary with the summary of the transactions of each day
+    daily_summary = []
+
+    for day in range(days):
+        # get the date of the day
+        date = start_date + timedelta(days=day)
+        # get the transactions of the day
+        transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": date.isoformat()}}, {
+            "timestamp": {"$lte": (date + timedelta(days=1)).isoformat()}}, filter_for_transaction_type]}))
+
+        # summary
+        total_made_daily = 0
+        total_by_meal_daily = 0
+        total_by_item_daily = 0
+        items_sold_daily = 0
+        clients_with_more_transactions_daily = []
+        more_selled_items_in_period_daily = []
+
+        for transaction in transactions:
+            # more selled items of the day
+            # create a dictionary with the item_id, the amount sold and the total made
+            for item in transaction["items"]:
+                item_in_period = next(
+                    (item_period for item_period in more_selled_items_in_period_daily if item_period["item_id"] == item["item_id"]), None)
+                if item_in_period is None:
+                    more_selled_items_in_period_daily.append(
+                        {"item_id": item["item_id"], "quantity": item["quantity"], "price": item["price"], "total": item["quantity"] * item["price"]})
+                else:
+                    item_in_period["quantity"] += item["quantity"]
+                    item_in_period["total"] += item["quantity"] * item["price"]
+
+            # clients with more transactions and how much they spent
+            client_in_period = next(
+                (client_period for client_period in clients_with_more_transactions_daily if client_period["client_id"] == transaction["client_id"]), None)
+            if client_in_period is None:
+                clients_with_more_transactions_daily.append(
+                    {"client_id": transaction["client_id"], "transactions": 1, "total": transaction["total"], "name": transaction["client_name"], "email": transaction["client_email"]})
+            else:
+                client_in_period["transactions"] += 1
+                client_in_period["total"] += transaction["total"]
+
+            total_made_daily += transaction["total"]
+            total_by_meal_daily += transaction["meal_price"]
+            total_by_item_daily += transaction["total"] - \
+                transaction["meal_price"]
+            items_sold_daily += len(transaction["items"])
+
+        # sort the clients by transactions
+        clients_with_more_transactions_daily.sort(
+            key=lambda client: client["transactions"], reverse=True)
+        # get the first 5 clients
+        clients_with_more_transactions_daily = clients_with_more_transactions_daily[:5]
+
+        # add the summary of the day to the daily_summary dictionary
+        daily_summary.append({
+            "date": date.isoformat(),
+            "total_sells": len(transactions),
+            "total_made": total_made_daily,
+            "total_by_meal": total_by_meal,
+            "total_by_item": total_by_item_daily,
+            "items_sold": items_sold_daily,
+            "more_selled_items": more_selled_items_in_period_daily[:5] if len(more_selled_items_in_period_daily) > 5 else more_selled_items_in_period_daily,
+            "clients_with_more_transactions_daily": clients_with_more_transactions_daily
+        })
+
+    # sort the daily summary by date in descending order
+    daily_summary.sort(key=lambda day: day["date"], reverse=True)
+
+    # -------------------------------------------------------------------------------------------------
+    # create a daily summary for the transactions of type "stock"
+    # get the first day of the period
+    start_date = datetime.fromisoformat(start_timestamp).replace(
+        hour=0, minute=0, second=0, microsecond=0)
+    # get the last day of the period
+    end_date = datetime.fromisoformat(end_timestamp).replace(
+        hour=23, minute=59, second=59, microsecond=999999)
+    # get the number of days in the period
+    days = (end_date - start_date).days + 1
+    # create a dictionary with the summary of the transactions of each day
+    daily_stock_summary = []
+
+    for day in range(days):
+        # get the date of the day
+        date = start_date + timedelta(days=day)
+        # get the transactions of the day
+        transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": date.isoformat()}}, {
+            "timestamp": {"$lte": (date + timedelta(days=1)).isoformat()}}, {"transaction_type": "stock"}]}))
+
+        # summary
+        total_made_daily_stock = 0
+        items_sold_daily_stock = 0
+        more_selled_items_in_period_daily_stock = []
+
+        for transaction in transactions:
+            # more selled items of the day
+            # create a dictionary with the item_id, the amount sold and the total made
+            for item in transaction["items"]:
+                item_in_period = next(
+                    (item_period for item_period in more_selled_items_in_period_daily_stock if item_period["item_id"] == item["item_id"]), None)
+                if item_in_period is None:
+                    more_selled_items_in_period_daily_stock.append(
+                        {"item_id": item["item_id"], "quantity": item["quantity"], "price": item["price"], "total": item["quantity"] * item["price"]})
+                else:
+                    item_in_period["quantity"] += item["quantity"]
+                    item_in_period["total"] += item["quantity"] * item["price"]
+
+            total_made_daily_stock += transaction["total"]
+            items_sold_daily_stock += len(transaction["items"])
+
+        # add the summary of the day to the daily_summary dictionary
+        daily_stock_summary.append({
+            "date": date.isoformat(),
+            "total_sells": len(transactions),
+            "total_made": total_made_daily_stock,
+            "items_sold": items_sold_daily_stock,
+            "more_selled_items": more_selled_items_in_period_daily_stock,
+        })
+
+        # sort the daily summary by date in descending order
+        daily_stock_summary.sort(key=lambda day: day["date"], reverse=True)
+
+    # -------------------------------------------------------------------------------------------------
+
+    summary = {
+        "total_sells": total_sells,
+        "total_made": total_made,
+        "total_by_meal": total_by_meal,
+        "total_by_item": total_by_item,
+        "items_sold": items_sold,
+        "more_selled_items": more_selled_items,
+        "clients_with_more_transactions": clients_with_more_transactions,
+        "clients_that_spent_more_money": clients_that_spent_more_money,
+        "daily_summary": daily_summary,
+        "daily_stock_summary": daily_stock_summary
+    }
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(summary, default=convert_object_id)))
+
+
+@app.get("/api/transactions/summary/{client_id}/period/{period}", tags=["transactions"])
+async def get_transactions_summary_by_client(client_id, period: str = "Hoje"):
+    '''
+    Get the transactions summary of a specific client in a specific period of time.
+    - Total sells
+    - Total made
+    - Total by meal
+    - Total by item
+    - Items sold
+    - More selled items
+    - Clients with more transactions
+    - Clients that spent more money
+
+    Periods: "Hoje", "Ontem", "Últimos 7 dias", "Últimos 30 dias", "3 Mêses", "Selecione um período"
+    Attributes:
+        client_id(str): Unique ID of the client.
+    '''
+
+    start_timestamp, end_timestamp = get_init_and_end_timestamp_from_period(
+        period)
+
+    if client_id is not None:
+        transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": start_timestamp}}, {
+            "timestamp": {"$lte": end_timestamp}}, {"client_id": client_id}]}))
+    else:
+        raise HTTPException(
+            status_code=400, detail="client_id must be provided")
+
+    # total sells
+    total_sells = len(transactions)
+    # summary
+    total_made = 0
+    total_by_meal = 0
+    total_by_item = 0
+    items_sold = 0
+    more_selled_items_in_period = []
+
+    for transaction in transactions:
+        total_made += transaction["total"]
+        total_by_meal += transaction["meal_price"]
+        total_by_item += transaction["total"] - transaction["meal_price"]
+        items_sold += len(transaction["items"])
+
+        # more selled items of the period
+        # create a dictionary with the item_id, the amount sold and the total made
+        for item in transaction["items"]:
+            item_in_period = next(
+                (item_period for item_period in more_selled_items_in_period if item_period["item_id"] == item["item_id"]), None)
+            if item_in_period is None:
+                more_selled_items_in_period.append(
+                    {"item_id": item["item_id"], "quantity": item["quantity"], "price": item["price"], "total": item["quantity"] * item["price"]})
+            else:
+                item_in_period["quantity"] += item["quantity"]
+                item_in_period["total"] += item["quantity"] * item["price"]
+
+    # sort the items by quantity
+    more_selled_items_in_period.sort(
+        key=lambda item: item["quantity"], reverse=True)
+    # get the first 5 items
+    more_selled_items = more_selled_items_in_period[:5]
+
+    # get the first day of the period
+    start_date = datetime.fromisoformat(start_timestamp).replace(
+        hour=0, minute=0, second=0, microsecond=0)
+    # get the last day of the period
+    end_date = datetime.fromisoformat(end_timestamp).replace(
+        hour=23, minute=59, second=59, microsecond=999999)
+    # get the number of days in the period
+    days = (end_date - start_date).days + 1
+    # create a dictionary with the summary of the transactions of each day
+    daily_summary = []
+
+    for day in range(days):
+        # get the date of the day
+        date = start_date + timedelta(days=day)
+        # get the transactions of the day
+        transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": date.isoformat()}}, {
+            "timestamp": {"$lte": (date + timedelta(days=1)).isoformat()}}, {"client_id": client_id}]}))
+
+        # summary
+        total_made_daily = 0
+        total_by_meal_daily = 0
+        total_by_item_daily = 0
+        items_sold_daily = 0
+        more_selled_items_in_period_daily = []
+
+        for transaction in transactions:
+            # more selled items of the day
+            # create a dictionary with the item_id, the amount sold and the total made
+            for item in transaction["items"]:
+                item_in_period = next(
+                    (item_period for item_period in more_selled_items_in_period_daily if item_period["item_id"] == item["item_id"]), None)
+                if item_in_period is None:
+                    more_selled_items_in_period_daily.append(
+                        {"item_id": item["item_id"], "quantity": item["quantity"], "price": item["price"], "total": item["quantity"] * item["price"]})
+                else:
+                    item_in_period["quantity"] += item["quantity"]
+                    item_in_period["total"] += item["quantity"] * item["price"]
+
+            total_made_daily += transaction["total"]
+            total_by_meal_daily += transaction["meal_price"]
+            total_by_item_daily += transaction["total"] - \
+                transaction["meal_price"]
+            items_sold_daily += len(transaction["items"])
+
+        # add the summary of the day to the daily_summary dictionary
+        daily_summary.append({
+            "date": date.isoformat(),
+            "total_sells": len(transactions),
+            "total_made": total_made_daily,
+            "total_by_meal": total_by_meal,
+            "total_by_item": total_by_item_daily,
+            "items_sold": items_sold_daily,
+            "more_selled_items": more_selled_items_in_period_daily[:5] if len(more_selled_items_in_period_daily) > 5 else more_selled_items_in_period_daily
+        })
+
+    # sort the daily summary by date in descending order
+    daily_summary.sort(key=lambda day: day["date"], reverse=True)
+
+    summary = {
+        "total_sells": total_sells,
+        "total_made": total_made,
+        "total_by_meal": total_by_meal,
+        "total_by_item": total_by_item,
+        "items_sold": items_sold,
+        "more_selled_items": more_selled_items,
+        "daily_summary": daily_summary
+    }
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(summary, default=convert_object_id)))

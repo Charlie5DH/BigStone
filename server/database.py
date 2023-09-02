@@ -18,6 +18,20 @@ def get_clients_collection():
     return collection
 
 
+def get_weights_collection():
+    db = connect_to_mongo()
+    collection = db[os.environ["CLIENT_DB_NAME"]
+                    ]["weight_history"]
+    return collection
+
+
+def get_kg_price_collection():
+    db = connect_to_mongo()
+    collection = db[os.environ["CLIENT_DB_NAME"]
+                    ]["kg_price"]
+    return collection
+
+
 def get_items_collection():
     db = connect_to_mongo()
     collection = db[os.environ["CLIENT_DB_NAME"]

@@ -1,0 +1,9 @@
+export { default as Home } from "./Home/Home";
+export { default as Products } from "./Products/Products";
+export { default as Records } from "./Records/Records";
+export { default as Clients } from "./Clients/Clients";
+export { default as Settings } from "./Settings/Settings";
+export { default as NotFound } from "./NotFound/NotFound";
+export { default as SignIn } from "./Auth/SignIn";
+export { default as SignOut } from "./Auth/SignOut";
+export { default as User } from "./User/User";

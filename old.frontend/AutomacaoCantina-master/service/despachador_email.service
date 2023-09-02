@@ -1,0 +1,9 @@
+[Unit]
+Description=Despachador de Emails da Cantina
+
+[Service]
+ExecStart=/home/ubuntu/AutomacaoCantina/despachador-de-email/motor_envia_email.sh
+Restart=always
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# funde as listas em um único arquivo
+# for d in `ls lista*.csv`; do awk NR\>1 $d >>  comp.csv ; done
+
+# remove o \n no comp.csv (usa a ferramenta de replace do proprio exccel
+
+
+cab="cliente_id,cliente_tipo,cliente_matricula,cliente_nome,cliente_familia,cliente_ano,cliente_pais_1,cliente_pais_2,cliente_email_1,cliente_email_2,cliente_telefone_1,cliente_telefone_2,cliente_telefone_3,cliente_telefone_4,cliente_telefone_5,cliente_telefone_6,cliente_telefone_7,cliente_telefone_8,cliente_telefone_9,cliente_data"
+
+cat $1 | awk -F\, '{ 
+  cliente_matricula=$1
+  cliente_nome=$2
+  cliente_pais_1=$4
+  cliente_pais_2=$6
+
+  if (length(cliente_nome) < 2) next
+  if (cliente_nome == "NOME DO ALUNO") next
+
+  print cliente_matricula "," cliente_nome "," cliente_pais_1 "," cliente_pais_2
+}' > sai_sai_sai
+
+i=0
+while IFS="," read fMatr fName fPai fMae ; do
+
+   email=$(cat Clientes.csv | awk -F\, -v fMatr=$fMatr '{
+      if ("\""fMatr"\"" == $8)
+         email = $11 "," $12
+      } END { 
+         if (length(email) < 2) email = "," 
+         print email 
+      }')
+
+	((i += 1))
+
+	echo "\"$i\",NULL,\"$fName\",\"$fName\",\"Aluno\",NULL,,\"$fMatr\",\"$fPai\",\"$fMae\",$email,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL"
+
+
+done < sai_sai_sai
+rm sai_sai_sai
+

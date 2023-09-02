@@ -1,0 +1,312 @@
+cliente_id,cliente_tipo,cliente_matricula,cliente_nome,cliente_familia,cliente_ano,cliente_pais_1,cliente_pais_2,cliente_email_1,cliente_email_2,cliente_telefone_1,cliente_telefone_2,cliente_telefone_3,cliente_telefone_4,cliente_telefone_5,cliente_telefone_6,cliente_telefone_7,cliente_telefone_8,cliente_telefone_9,cliente_data
+
+1;Aluno;107377;ALICE HEISECKE DE ALMEIDA MACHADO;ALICE HEISECKE DE ALMEIDA MACHADO;   1 ANO ;;;dioneimachado@gmail.com;carm.bha@gmail.com
+2;Aluno;1352;ANA CLARA RETZ SANTIAGO BUENO;ANA CLARA RETZ SANTIAGO BUENO;   1 ANO ;;;renatosantiagobueno@gamil.com
+3;Aluno;1430;ANAUÁ WALTRICK GARCIA;ANAUÁ WALTRICK GARCIA;   1 ANO ;;;garcia.aw@gmail.com;flaviarw@gmail.com
+4;Aluno;107466;BEATRICE VIDAL HOMRICH;BEATRICE VIDAL HOMRICH;   1 ANO ;;;eduardohomrich@hotmail.fr;larissavidal2010@hotmail.com
+5;Aluno;1429;BENJAMÍN AGUILERA EUGÊNIO;BENJAMÍN AGUILERA EUGÊNIO;   1 ANO ;;;paguilef@hotmail.com;clareana_e@hotmail.com
+6;Aluno;107164;BENJAMIN RIBAS BELOHLAVEK;BENJAMIN RIBAS BELOHLAVEK;   1 ANO ;;;alfredo.belohlavek@gmail.com;luiza.ribas@gmail.com
+7;Aluno;106559;BENJAMIN SIMONI MASSARO;BENJAMIN SIMONI MASSARO;   1 ANO ;;;ulissesrrm@gmail.com;kasimoni@gmail.com
+8;Aluno;106486;CATARINA MEZZOMO LAYDNER;CATARINA MEZZOMO LAYDNER;   1 ANO ;;;fredylf@hotmail.com;natimezzomo@gmail.com
+9;Aluno;107784;EDUARDO DA COSTA RIBEIRO;EDUARDO DA COSTA RIBEIRO;   1 ANO ;;;andrebatistela@hotmail.com;thatyscosta@gmail.com
+10;Aluno;107399;KAI ALVES BERGANTE;KAI ALVES BERGANTE;   1 ANO ;;;carlosb007@hotmail.com;denisea04@gmail.com
+11;Aluno;104408;KIARA NUNES CHAMLIAN;KIARA NUNES CHAMLIAN;   1 ANO ;;;rchamlian@uol.com;cris_manica@hotmail.com
+12;Aluno;107318;KOJI ABREU FJELDSTAD;KOJI ABREU FJELDSTAD;   1 ANO ;;;mohanuman@yahoo.ca;suvittiabreu@hotmail.com
+13;Aluno;1372;LARA SILVA CAVALHEIRO HOFFMANN;LARA SILVA CAVALHEIRO HOFFMANN;   1 ANO ;;;biomarceneirabio@gmail.com;merilyn.nossol@gmail.com
+14;Aluno;101204;LETÍCIA ADÃO VERZA;LETÍCIA ADÃO VERZA;   1 ANO ;;;eledioverza@gmail.com;izaltinaadao@gmail.com
+15;Aluno;100046;LUCCA VAN CLEAVE RIBEIRO;LUCCA VAN CLEAVE RIBEIRO;   1 ANO ;;;fallan.nr@hotmail.com;shanpsi@hotmail.com
+16;Aluno;1406;LUIZA FLORES DIAS;LUIZA FLORES DIAS;   1 ANO ;;;ibsem.dias@gmail.com;claudinha23@gmail.com
+17;Aluno;102278;MAITÊ ALCANTARA WIESE;MAITÊ ALCANTARA WIESE;   1 ANO ;;;ricardosocas@hotmail.com;rachel.palhares@gmail.com
+18;Aluno;101271;MANUELA BURIGO CONDÉ;MANUELA BURIGO CONDÉ;   1 ANO ;;;gabrielconde1710@gmail.com;tesouraria@anaba.com.br
+19;Aluno;1408;MANUELA RAEDER ROCHA;MANUELA RAEDER ROCHA;   1 ANO ;;;gustavoccrocha@hotmail.com;mariana.raeder@yahoo.com.br
+20;Aluno;1431;MARIAH PAES LEME PINHEIRO;MARIAH PAES LEME PINHEIRO;   1 ANO ;;;marcel@npu.com.br;maristela@npu.com.br
+21;Aluno;105590;MARIRI RAMOS CORRAINI DA ROSA;MARIRI RAMOS CORRAINI DA ROSA;   1 ANO ;;;srdarosa@mail.com;ramoscordarosa@gmail.com
+22;Aluno;102154;RAFAELLA BARBOSA HOLLOWAY;RAFAELLA BARBOSA HOLLOWAY;   1 ANO ;;;saintholloway@yahoo.com.br;cynthiacpbarbosa@yahoo.com.br
+23;Aluno;1373;RAUL BELANDO CASTRO;RAUL BELANDO CASTRO;   1 ANO ;;;tiagocastro2003@yahoo.com.br;marianebelando@yahoo.com.br
+24;Aluno;107369;RAVI ALARCON SALVADOR;RAVI ALARCON SALVADOR;   1 ANO ;;;carloshasalvador@hotmail.com;alercon.gissu@gmail.com
+25;Aluno;102120;SEBASTIAN CIGARAN ARNOLD;SEBASTIAN CIGARAN ARNOLD;   1 ANO ;;;alexandre.arnold@trf4.jus.br;elizecigaran@yahoo.com.br
+26;Aluno;104858;TEÓFILO LOPES DE SOUZA SANTOS;TEÓFILO LOPES DE SOUZA SANTOS;   1 ANO ;;;santossul@bol.com.br;kellycristiane2012@bol.com.br
+27;Aluno;107334;THEO ALARCON SALVADOR;THEO ALARCON SALVADOR;   1 ANO ;;;carloshasalvador@hotmail.com;alercon.gissu@gmail.com
+28;Aluno;107628;VALQUIRIA PRIESTER ADAMES;VALQUIRIA PRIESTER ADAMES;   1 ANO ;;;fabianoadames@hotmail.com
+29;Aluno;105299;YASMIN SONOBE BERLEZE;YASMIN SONOBE BERLEZE;   1 ANO ;;;cristiano_88berleze@hotmail.com;sonobesonobe@hotmail.com
+30;Aluno;101808;ANTHONI AVELLEDA FUGULIN;ANTHONI AVELLEDA FUGULIN;   2 ANO ;;;mandrakefugulin@hotmail.com;suellenavelleda@gmail.com
+31;Aluno;1314;ANTÔNIO DE BARROS PIRES PAULUCI;ANTÔNIO DE BARROS PIRES PAULUCI;   2 ANO ;;;guilhermebbp71@gmail.com;cmpires@gmail.com
+32;Aluno;102308;ARTHUR MEDEIROS OSTETTO;ARTHUR MEDEIROS OSTETTO;   2 ANO ;;;caue.ostetto@euqueroinvestir.com;emanuella.medeiros@hotmail.com
+33;Aluno;1437;ARTHUR WOLFF DE FREITAS;ARTHUR WOLFF DE FREITAS;   2 ANO ;;;ana_wolff@yahoo.com.br
+34;Aluno;1523;BENJAMIN SILVEIRA CUMIN;BENJAMIN SILVEIRA CUMIN;   2 ANO ;;;keyson.cumin@hotmail.com;kel.enf@hotmail.com
+35;Aluno;1434;CAIQUE FERNANDES URBAN WOOD;CAIQUE FERNANDES URBAN WOOD;   2 ANO ;;;caue_wood@hotmail.com;urbanmarianafernandes@gmail.com
+36;Aluno;1410;CAROLINA GONZAGA GOMES;CAROLINA GONZAGA GOMES;   2 ANO ;;;danigonzaga@hotmail.com
+37;Aluno;104122;CASSIA VIDAL FERRARI;CASSIA VIDAL FERRARI;   2 ANO ;;;aldoferrari@uol.com.br;flavias_vidal@yahoo.com
+38;Aluno;1375;CORALINA BARRETTA GONÇALVES LOPES;CORALINA BARRETTA GONÇALVES LOPES;   2 ANO ;;;jricardolopes@hotmail.com;annecarolllopes@gmail.com
+39;Aluno;104700;FLORA DE LUCCA PESSOA;FLORA DE LUCCA PESSOA;   2 ANO ;;;iyengarfloripa@gmail.com;iyengarfloripa@gmail.com
+40;Aluno;1378;GABRIELA DUTRA MACKENZIE;GABRIELA DUTRA MACKENZIE;   2 ANO ;;;tjmackenzie@gmail.com;lulidutra@gmail.com
+41;Aluno;1489;GAEL MELLO GARCEZ;GAEL MELLO GARCEZ;   2 ANO ;;;rodgarcez40@gmail.com;evaadriane@hotmail.com
+42;Aluno;1358;JOAQUIM BARARDI VENEGAS;JOAQUIM BARARDI VENEGAS;   2 ANO ;;;javier.h.venegas@gmail.com;maribarardi@gmail.com
+43;Aluno;101514;KAINAN DA SILVA CAMINHA;KAINAN DA SILVA CAMINHA;   2 ANO ;;;kaleu.caminha@gmail.com;suelen.yoga@gmail.com
+44;Aluno;1492;LETÍCIA ROMAGUERA BUOSI;LETÍCIA ROMAGUERA BUOSI;   2 ANO ;;;cleber@romaguerabuosi.com;feromaguera@gmail.com
+45;Aluno;1376;LORENA GRASSMANN;LORENA GRASSMANN;   2 ANO ;;;ricardo.grassmann@gmail.com;lisianeg@gmail.com
+46;Aluno;1443;LUANA MOTTA LOPES HAEMING PEREIRA;LUANA MOTTA LOPES HAEMING PEREIRA;   2 ANO ;;;rodrigonaturologia@gmail.com;elianamotta@hotmail.com
+47;Aluno;101484;MAÍRA CAPPUCCI POPPI;MAÍRA CAPPUCCI POPPI;   2 ANO ;;;jorgepoppi1@gmail.com;pizzariadocica@hotmail.com
+48;Aluno;1444;MAITÊ DE PAIVA LEÃO;MAITÊ DE PAIVA LEÃO;   2 ANO ;;;mleaos1@gmail.com;julia_paiva@yahoo.com.br
+49;Aluno;1377;MANUELA RAMME PETEFFI DA SILVA;MANUELA RAMME PETEFFI DA SILVA;   2 ANO ;;;rpeteffi@gmail.com;adrianasramme@gmail.com
+50;Aluno;1315;MARIA VITÓRIA FINOTTI BALTAR;MARIA VITÓRIA FINOTTI BALTAR;   2 ANO ;;;marcos.baltar@ufsc.br;arfinotti@hotmail.com
+51;Aluno;1433;MARINA FORTUNATO PICA;MARINA FORTUNATO PICA;   2 ANO ;;;cqp@certi.org.br;saniabem@gmail.com
+52;Aluno;1493;NINA STREIBEL BERTONI;NINA STREIBEL BERTONI;   2 ANO ;;;crisbertoni@gmail.com;laurastreibel@gmail.com
+53;Aluno;108992;PEDRO GIULIANO MONTEIRO;PEDRO GIULIANO MONTEIRO;   2 ANO ;;;marcelo@lagoadocassange.com.br;isney@lagoadocassange.com.br
+54;Aluno;1435;SOFIA SABEL BOUSFIELD GONÇALVES;SOFIA SABEL BOUSFIELD GONÇALVES;   2 ANO ;;;marcoaurelio0302@gmail.com;jainasabelb@gmail.com
+55;Aluno;108969;VITOR GIULIANO MONTEIRO;VITOR GIULIANO MONTEIRO;   2 ANO ;;;marcelo@lagoadocassange.com.br;isney@lagoadocassange.com.br
+56;Aluno;1290;ANITA STORTO VANIN;ANITA STORTO VANIN;   3 ANO ;;;alexsandro.vanin@gmail.com;graziela.storto@gmail.com
+57;Aluno;1264;ANTONIO MACHADO BUENO;ANTONIO MACHADO BUENO;   3 ANO ;;;lucasreisbueno@gmail.com;julianasallesmachado@gmail.com
+58;Aluno;1380;AUGUSTO CARDOSO PARENTE;AUGUSTO CARDOSO PARENTE;   3 ANO ;;;edulparente@gmail.com;mariacarolinaduva@gmail.com
+59;Aluno;1411;AURORA CRISTAL COELHO REBOREDO;AURORA CRISTAL COELHO REBOREDO;   3 ANO ;;;rampazzoandre@gmail.com;espacocriativo@gmail.com
+60;Aluno;1265;BEATRIZ VENTURA FADEL;BEATRIZ VENTURA FADEL;   3 ANO ;;;ljfadel@gmail.com;mavfadel@gmail.com
+61;Aluno;101123;CAETANO MOREIRA DA SILVA;CAETANO MOREIRA DA SILVA;   3 ANO ;;;rodrigomoreir@gmail.com;camilacfh@hotmail.com
+62;Aluno;109027;DANIEL DA COSTA RIBEIRO;DANIEL DA COSTA RIBEIRO;   3 ANO ;;;andrebatistela@hotmail.com;thatyscosta@gmail.com
+63;Aluno;1344;ESTELA BAVARESCO CORREIA;ESTELA BAVARESCO CORREIA;   3 ANO ;;;ad.fernando.correia@gmail.com;doula.gabriela@gmail.com
+64;Aluno;1289;FELIPE MEZZOMO JAHNS;FELIPE MEZZOMO JAHNS;   3 ANO ;;;mjahns@gmail.com;marciarmezzomo@gmail.com
+65;Aluno;1487;FRANCESCO RAMOS CUSTÓDIO PINTO;FRANCESCO RAMOS CUSTÓDIO PINTO;   3 ANO ;;;alechandrepinto@gmail.com;valeriarspinto@gmail.com
+66;Aluno;1442;ÍCARO BELTRAME DA SILVA;ÍCARO BELTRAME DA SILVA;   3 ANO ;;;marcio.claudia@gmail.com;marcio.claudia@gmail.com
+67;Aluno;1341;ISA ANDRADE BECK;ISA ANDRADE BECK;   3 ANO ;;;iraebeck@hotmail.com;sorayabeck@gmail.com
+68;Aluno;108470;JOANA PASSOLD;JOANA PASSOLD;   3 ANO ;;
+69;Aluno;1439;JOAQUIM CANDEMIL DE OLIVEIRA BUSS GONÇALVES;JOAQUIM CANDEMIL DE OLIVEIRA BUSS GONÇALVES;   3 ANO ;;;mauricio@basisbrasil.com.br;fernandac@brturbo.com.br
+70;Aluno;1490;JOAQUIM MARCONDES E SILVA;JOAQUIM MARCONDES E SILVA;   3 ANO ;;;oeverton.silva@gmail.com;belmattos@hotmail.com
+71;Aluno;1263;JOAQUIM MORENO DE OLIVEIRA;JOAQUIM MORENO DE OLIVEIRA;   3 ANO ;;;fredericoo@hotmail.com;mcarol2k@hotmail.com
+72;Aluno;1286;LEILA AKBARNIA;LEILA AKBARNIA;   3 ANO ;;;ramin@iwantenglishnow.com.br;gilpuff@gmail.com
+73;Aluno;1261;LIS DA SILVA HOFFMANN;LIS DA SILVA HOFFMANN;   3 ANO ;;;biomarceneirabio@gmail.com;merilyn.nossol@gmail.com
+74;Aluno;1517;MARIA DE TOLEDO COOKE;MARIA DE TOLEDO COOKE;   3 ANO ;;;fcooke@me.com;madatoledo@gmail.com
+75;Aluno;1491;MARIA JANAÍNA DE LIMA CORDEIRO;MARIA JANAÍNA DE LIMA CORDEIRO;   3 ANO ;;;barbaranaturologa@gmail.com
+76;Aluno;1294;MARIELLE LOPES MOTTA;MARIELLE LOPES MOTTA;   3 ANO ;;;mariella.lopes@gmail.com;mariella.lopes@gmail.com
+77;Aluno;101107;MIGUEL LUCENA DIJKSTRA;MIGUEL LUCENA DIJKSTRA;   3 ANO ;;;edijkstra@yahoo.com;fernanda@teia.arq.br
+78;Aluno;1324;OLIVIA CHEDE ROTOLO CALDAS;OLIVIA CHEDE ROTOLO CALDAS;   3 ANO ;;;ricocal@terra.com.br;fefolete@gmail.com
+79;Aluno;1285;SERENA VICENTINI BOGO;SERENA VICENTINI BOGO;   3 ANO ;;;bogo.marcelo@gmail.com;vicentinidan@gmail.com
+80;Aluno;1466;SOFIA TAPIA XAVIER;SOFIA TAPIA XAVIER;   3 ANO ;;;xaviermec@hotmail.com;milenatx@yahoo.com.br;milenatx@yahoo.com.br
+81;Aluno;104920;TOMAS HEISECKE DE ALMEIDA MACHADO;TOMAS HEISECKE DE ALMEIDA MACHADO;   3 ANO ;;;dioneimachado@gmail.com;carm.bha@gmail.com
+82;Aluno;100991;VITÓRIA MARIA JANAÍNA BEUST NAIME;VITÓRIA MARIA JANAÍNA BEUST NAIME;   3 ANO ;;;eduardonaime@gmail.com;tatianabeust@hotmail.com
+83;Aluno;1191;AMIRO SERAFIM;AMIRO SERAFIM;   4 ANO ;;;tomasaserafim@gmail.com;bibianahsousa@gmail.com
+84;Aluno;1438;ANA FERREIRA FRANÇA;ANA FERREIRA FRANÇA;   4 ANO ;;;urb.ademir@gmail.com;rosaferreira7@gmail.com
+85;Aluno;1295;AYRA LIRA CAMORLINGA;AYRA LIRA CAMORLINGA;   4 ANO ;;;rafacamorlinga@gmail.com;milalira09@gmail.com
+86;Aluno;101956;BENTO GONÇALVES MACHADO;BENTO GONÇALVES MACHADO;   4 ANO ;;;renatodmmachado@gmail.com;gabrielarodriguesg@gmail.com
+87;Aluno;108780;CLARA ALPENDRE XANARDIDI SMEGE;CLARA ALPENDRE XANARDIDI SMEGE;   4 ANO ;;;daniel@danielsnege.com.br;elinisealpendrezanardidi@gmail.com
+88;Aluno;1383;DAVI DAL BÓ DA SILVA;DAVI DAL BÓ DA SILVA;   4 ANO ;;;leisemonteirodalbo@gmail.com
+89;Aluno;1475;DAVI SCHUMACHER ROLIIM DE MOURA;DAVI SCHUMACHER ROLIIM DE MOURA;   4 ANO ;;;nenomoura@gmail.com;schumacher.lis@gmail.com
+90;Aluno;1186;EOIN ZANONI;EOIN ZANONI;   4 ANO ;;;premendrababa@hotmail.com,;bebhinnramsay@gmail.com
+91;Aluno;1470;FRANCISCO PICONE VILLAS BÔAS;FRANCISCO PICONE VILLAS BÔAS;   4 ANO ;;;paxability@gmail.com;claupicone@yahoo.com.br
+92;Aluno;1331;HENRIQUE GRASSMANN;HENRIQUE GRASSMANN;   4 ANO ;;;ricardo.grassmann@gmail.com;lisianeg@gmail.com
+93;Aluno;1293;ISABEL MICHIELLI FERREIRA;ISABEL MICHIELLI FERREIRA;   4 ANO ;;;milregis@yahoo.com.br;amaliamichielli@yahoo.com
+94;Aluno;1201;ISABELA WZOREK SCHLEMMER;ISABELA WZOREK SCHLEMMER;   4 ANO ;;;pizzariafofinho@gmail.com;elizetelondon@yahoo.com.br
+95;Aluno;1468;ISADORA BUENO ROESLER;ISADORA BUENO ROESLER;   4 ANO ;;;crroesler@gmail.com;daisybueno@gmail.com
+96;Aluno;1467;LAURA VIDAL FERRARI;LAURA VIDAL FERRARI;   4 ANO ;;;aldoferrari@uol.com.br;flavias_vidal@yahoo.com
+97;Aluno;1471;LEILA LOUISE SCHWEITZER MILLER;LEILA LOUISE SCHWEITZER MILLER;   4 ANO ;;;r.miller@ufsc.br;cristinaschweitzer@hotmail.com
+98;Aluno;108381;LORENZO COSTA IANNONE;LORENZO COSTA IANNONE;   4 ANO ;;;lucio_iannone@hotmail.com;costa_luciene@hotmail.com
+99;Aluno;1318;LUARA NAGASHIMA PORTO;LUARA NAGASHIMA PORTO;   4 ANO ;;;rondonpjunior@gmail.com;melnaga@hotmail.com
+100;Aluno;1440;LUCAS NOTO COLTRO;LUCAS NOTO COLTRO;   4 ANO ;;;coltromarcelo@hotmail.com;denoto@hotmail.com
+101;Aluno;1166;MATEUS CORREIA DE FREITAS LETZOW;MATEUS CORREIA DE FREITAS LETZOW;   4 ANO ;;;marceloletz@gmail.com;silfloripa@yahoo.com.br
+102;Aluno;1473;OTO BITENCOURT REIS;OTO BITENCOURT REIS;   4 ANO ;;;kleiber_reis@hotmail.com;mariliabit@gmail.com
+103;Aluno;1474;ROBERTA KAJA SCHUHMANN;ROBERTA KAJA SCHUHMANN;   4 ANO ;;;katjaonthehill@gmail.com
+104;Aluno;1272;YAN SOARES HOMEM;YAN SOARES HOMEM;   4 ANO ;;;agapitohomem19@gmail.com
+105;Aluno;1123;ALICE ÉGAS DE BARROS;ALICE ÉGAS DE BARROS;   5 ANO ;;;patipado@yahoo.com.br
+106;Aluno;1340;ANTONIO LUIS TOMASELLI HOUAYEK;ANTONIO LUIS TOMASELLI HOUAYEK;   5 ANO ;;;hugohouayek@gmail.com;biatomaselli@gmail.com
+107;Aluno;1414;BETINA FOLETTO PEDRINI;BETINA FOLETTO PEDRINI;   5 ANO ;;;andre.pedrini@uol.com.br;vanessafoletto@uol.com.br
+108;Aluno;1328;CAIO GRANDO MARCHINI;CAIO GRANDO MARCHINI;   5 ANO ;;;marcio.marchini@gmail.com;claudiane.grando@gmail.com
+109;Aluno;1194;CATARINA STORTO VANIN;CATARINA STORTO VANIN;   5 ANO ;;;alexsandro.vanin@gmail.com;graziela.storto@gmail.com
+110;Aluno;1525;CATHERINE LUISA SILVEIRA CUMIN;CATHERINE LUISA SILVEIRA CUMIN;   5 ANO ;;;keyson.cumin@hotmail.com;kel.enf@hotmail.com
+111;Aluno;1124;CLARA CAMPELLI BORTOLUZZI;CLARA CAMPELLI BORTOLUZZI;   5 ANO ;;;murilo.gb@hotmail.com;jussaracampelli@gmail.com
+112;Aluno;1425;DORA GUIMARÃES ARAUJO;DORA GUIMARÃES ARAUJO;   5 ANO ;;;financeiro@araujoatelier.com;elainevargui@hotmail.com
+113;Aluno;1387;EMILY ARCANJO MATIAS;EMILY ARCANJO MATIAS;   5 ANO ;;;jhowmaykhow@gmail.com;indiarcanjo2@gmail.com
+114;Aluno;1415;IAGO LUCENA DIJKSTRA;IAGO LUCENA DIJKSTRA;   5 ANO ;;;edijkstra@yahoo.com;fernanda@teia.arq.br
+115;Aluno;108330;JASMIM NOGUTI AGOSTINHO DA SILVA;JASMIM NOGUTI AGOSTINHO DA SILVA;   5 ANO ;;;JOAORODRIGOM@GMAIL.COM
+116;Aluno;1159;LAÍS PERES LIMA ROSA;LAÍS PERES LIMA ROSA;   5 ANO ;;;mauricior@celesc.com.br;patplima@hotmail.com
+117;Aluno;1421;LARA NOTO COLTRO;LARA NOTO COLTRO;   5 ANO ;;;coltromarcelo@hotmail.com;denoto@hotmail.com
+118;Aluno;1422;LIA RICCIARDONE ALQURESHI;LIA RICCIARDONE ALQURESHI;   5 ANO ;;;hakimhazim@gmail.com;danielaproduto@yahoo.com
+119;Aluno;1119;LUIZA MARCHI MAFRA;LUIZA MARCHI MAFRA;   5 ANO ;;;paulo@mafra.eti.br;jerusa.marchi@ufsc.br
+120;Aluno;1402;LUIZA PINHEIRO AGUIAR E SILVA BONATELLI DA CUNHA;LUIZA PINHEIRO AGUIAR E SILVA BONATELLI DA CUNHA;   5 ANO ;;;tiago.bonatelli@gmail.com;amirapinheiro@gmail.com
+121;Aluno;102626;MARINA VECCHIETTI GIRON;MARINA VECCHIETTI GIRON;   5 ANO ;;;jaghope@gmail.com;3mjuridico@gmail.com
+122;Aluno;1419;MELISSA OLIVEIRA BRAGAGLIA;MELISSA OLIVEIRA BRAGAGLIA;   5 ANO ;;;afgutobragaglia@yahoo.com;gabrielafreire13@hotmail.com
+123;Aluno;107679;MIRIAM DE OLIVEIRA MACEDO;MIRIAM DE OLIVEIRA MACEDO;   5 ANO ;;;j.edumacedo730@gmail.com;marciaoliveira50@gmail.com
+124;Aluno;1461;PEDRO DE FAVERI NECKEL;PEDRO DE FAVERI NECKEL;   5 ANO ;;;neckel_oliveira@yahoo.com.br;sbfaveri@gmail.com
+125;Aluno;1420;PEDRO VOIGDLENER MEDEIROS;PEDRO VOIGDLENER MEDEIROS;   5 ANO ;;;dacio@studiodearquitetura.com.br;tativoig@hotmail.com
+126;Aluno;1416;RAUL BUENO ROESLER;RAUL BUENO ROESLER;   5 ANO ;;;crroesler@gmail.com;daisybueno@gmail.com
+127;Aluno;1189;RENATO CABRAL CHAVES;RENATO CABRAL CHAVES;   5 ANO ;;;senna.autocenter@hotmail.com;angelamarizacabral@hotmail.com
+128;Aluno;1367;ALICE OSTETTO CIDADE;ALICE OSTETTO CIDADE;   6 ANO ;;;maiostetto@yahoo.com.br
+129;Aluno;1169;ARTHUR BREHSAN DE MELO;ARTHUR BREHSAN DE MELO;   6 ANO ;;;josetavaresjr@hotmail.com;nastaja.brehsan@gmail.com
+130;Aluno;1079;BEATRICE CHIARELOTTO PALMEIRA;BEATRICE CHIARELOTTO PALMEIRA;   6 ANO ;;;tlegis@hotmail.com;arivaneaugusta@gmail.com
+131;Aluno;1217;CATARINA MORENO DE OLIVEIRA;CATARINA MORENO DE OLIVEIRA;   6 ANO ;;;fredericoo@hotmail.com;mcarol2k@hotmail.com
+132;Aluno;1273;DANIEL TOMÁS LOPES MOTTA;DANIEL TOMÁS LOPES MOTTA;   6 ANO ;;;mariella.lopes@gmail.com
+133;Aluno;1197;ELIZABETH ALICE HOFFMANN MORRIS;ELIZABETH ALICE HOFFMANN MORRIS;   6 ANO ;;;hoffmannsa@hotmail.com
+134;Aluno;1154;EMANUELA MACHADO RUARO;EMANUELA MACHADO RUARO;   6 ANO ;;;pruaro@hotmail.com;cleunice@linhalivre.net
+135;Aluno;1332;ENRICO NICOLAZZI VERONESI;ENRICO NICOLAZZI VERONESI;   6 ANO ;;;facaverna@gmail.com;fernandanicolazzi@yahoo.com.br
+136;Aluno;104629;FERNANDA PETEFFI DA SILVA;FERNANDA PETEFFI DA SILVA;   6 ANO ;;;rpeteffi@gmail.com;adrianasramme@gmail.com
+137;Aluno;1362;GIOVANNA DE ANDRADE BRETAS GALASTRI;GIOVANNA DE ANDRADE BRETAS GALASTRI;   6 ANO ;;;fgalastri@yahoo.com.br;gabrielabretas@gmail.com
+138;Aluno;1223;HEITOR HASSMANN HAAS DE SOUZA;HEITOR HASSMANN HAAS DE SOUZA;   6 ANO ;;;luizhsneto@gmail.com;louinfantil8@gmail.com
+139;Aluno;1128;HELENA MEZZOMO JAHNS;HELENA MEZZOMO JAHNS;   6 ANO ;;;mjahns@gmail.com;marciarmezzomo@gmail.com
+140;Aluno;1392;JULIA ALINE DE SOUZA;JULIA ALINE DE SOUZA;   6 ANO ;;;shay.aline@gmail.com
+141;Aluno;1319;JULIANO FERRETTI;JULIANO FERRETTI;   6 ANO ;;;orlando.ferretti@ufsc.br;lurenata@yahoo.com.br
+142;Aluno;1360;KALI ROSA DUARTE ZEN;KALI ROSA DUARTE ZEN;   6 ANO ;;;grasiela.nutricionista@gmail.com
+143;Aluno;104726;LORENA LOPES DE SOUZA SANTOS;LORENA LOPES DE SOUZA SANTOS;   6 ANO ;;;santossul@bol.com.br;kellycristiane2012@bol.com.br
+144;Aluno;1143;LUAN NAGASHIMA PORTO;LUAN NAGASHIMA PORTO;   6 ANO ;;;rondonpjunior@gmail.com;melnaga@hotmail.com
+145;Aluno;1162;LUIS MIGUEL RIBEIRO CAIÇARA;LUIS MIGUEL RIBEIRO CAIÇARA;   6 ANO ;;;CDENNERC@HOTMAIL.COM;cacianeribeiro@gmail.com
+146;Aluno;1216;MARIA MORENA GOMES CANÇADO;MARIA MORENA GOMES CANÇADO;   6 ANO ;;;rafafafael@hotmail.com;mandalas.wow@gmail.com
+147;Aluno;1190;MATHIAS BARRETO SCHMIDT;MATHIAS BARRETO SCHMIDT;   6 ANO ;;;thomas@referenciasc.com.br;espacoatena@bol.com.br
+148;Aluno;1365;MAYARA KATARINA PFISTER;MAYARA KATARINA PFISTER;   6 ANO ;;;sashapfister@gmail.com
+149;Aluno;1363;MIGUEL BUCHELE GAMA;MIGUEL BUCHELE GAMA;   6 ANO ;;;gamaphoto@gmail.com;luciana.buchele@gmail.com
+150;Aluno;1125;MIGUEL DE AGOSTINO NUNES;MIGUEL DE AGOSTINO NUNES;   6 ANO ;;;arthur@plotkids.com;daniela.anaba@gmail.com
+151;Aluno;1126;RAVI AZEVEDO RIBEIRO;RAVI AZEVEDO RIBEIRO;   6 ANO ;;;almir.ribeiro.usp@gmail.com;aglaia.azevedo@gmail.com
+152;Aluno;1084;SAHA VIOLETA VIEIRA HERMES;SAHA VIOLETA VIEIRA HERMES;   6 ANO ;;;george.hermes@hotmail.com;reikisantinho@hotmail.com
+153;Aluno;1195;SARA FOGAÇA CAMPELLI;SARA FOGAÇA CAMPELLI;   6 ANO ;;;angelo.campelli@hotmail.com;patricia@cfs.com.br
+154;Aluno;1366;SOFIA GHISLENI GONZALEZ;SOFIA GHISLENI GONZALEZ;   6 ANO ;;;rodrigo.gonzalez@voeazul.com.br;katia.ghisleni@hotmail.com
+155;Aluno;1086;TARSILA FINOTTI BALTAR;TARSILA FINOTTI BALTAR;   6 ANO ;;;marcos.baltar@ufsc.br;arfinotti@hotmail.com
+156;Aluno;1113;YURI ANDRADE BECK;YURI ANDRADE BECK;   6 ANO ;;;iraebeck@hotmail.com;sorayabeck@gmail.com
+157;Aluno;1310;AIMÊ CORREA DA CUNHA;AIMÊ CORREA DA CUNHA;   7 ANO ;;;rennovare@rennovare.com.br
+158;Aluno;1118;ARTHUR CUNHA RANGEL DE SOUSA;ARTHUR CUNHA RANGEL DE SOUSA;   7 ANO ;;;rangel.fernando@gmail.com;aidacunhatrad@gmail.com
+159;Aluno;105013;ARTHUR FRANÇA CARVALHO;ARTHUR FRANÇA CARVALHO;   7 ANO ;;;brenofcarvalho@gmail.com;valescafv@gmail.com
+160;Aluno;1081;ARTHUR LUCAS DE SÁ;ARTHUR LUCAS DE SÁ;   7 ANO ;;;germanodesa@gmail.com;nataliemirilli@gmail.com
+161;Aluno;1192;CAMILA MACHADO BUENO;CAMILA MACHADO BUENO;   7 ANO ;;;lucasreisbueno@gmail.com;julianasallesmachado@gmail.com
+162;Aluno;1087;CAUÃ CORREIA DE FREITAS LETZOW;CAUÃ CORREIA DE FREITAS LETZOW;   7 ANO ;;;marceloletz@gmail.com;silfloripa@yahoo.com.br
+163;Aluno;1248;CLARA LUZ MASUTTI MARTINS BORGES;CLARA LUZ MASUTTI MARTINS BORGES;   7 ANO ;;;moises.mb@gmail.com;michele.masutti@gmail.com
+164;Aluno;1168;DAVI BREHSAN DE MELO;DAVI BREHSAN DE MELO;   7 ANO ;;;josetavaresjr@hotmail.com;nastaja.brehsan@gmail.com
+165;Aluno;108144;EDAN OLIVEIRA CUTUGNO;EDAN OLIVEIRA CUTUGNO;   7 ANO ;;;graziele.oliveira.batista@gmail.com
+166;Aluno;109000;ENZO GIULIANO MONTEIRO;ENZO GIULIANO MONTEIRO;   7 ANO ;;;marcelo@lagoadocassange.com.br;isney@lagoadocassange.com.br
+167;Aluno;1085;ENZO PAES LEME PINHEIRO;ENZO PAES LEME PINHEIRO;   7 ANO ;;;marcel@npu.com.br;maristela@npu.com.br
+168;Aluno;1361;GABRIEL VELLOSO VIANNA;GABRIEL VELLOSO VIANNA;   7 ANO ;;;nando.vianna@gmail.com;joanavelloso@gmail.com
+169;Aluno;105358;GUSTAVO ALEXANDRE CARMES;GUSTAVO ALEXANDRE CARMES;   7 ANO ;;;danicarmes@gmail.com
+170;Aluno;1308;HARIDAS BARACAT LOLI;HARIDAS BARACAT LOLI;   7 ANO ;;;yeremiloli@yahoo.com;lilananda.gopika@gmail.com
+171;Aluno;101980;ISABEL GONÇALVES MACHADO;ISABEL GONÇALVES MACHADO;   7 ANO ;;;renatodmmachado@gmail.com;gabrielarodriguesg@gmail.com
+172;Aluno;1464;ISADORA GABOARDI BASSANESI;ISADORA GABOARDI BASSANESI;   7 ANO ;;;fabianno0612@gmail.com;alessandra.gaboardi@gmail.com
+173;Aluno;1200;LAILA DE LUCCA PESSOA;LAILA DE LUCCA PESSOA;   7 ANO ;;;iyengarfloripa@gmail.com;iyengarfloripa@gmail.com
+174;Aluno;1096;LETÍCIA GOMES CANÇADO;LETÍCIA GOMES CANÇADO;   7 ANO ;;;rafafafael@hotmail.com;mandalas.wow@gmail.com
+175;Aluno;1368;LOUIS LECLERE;LOUIS LECLERE;   7 ANO ;;;leclereb@yahoo.br;leclerekatia@yahoo.fr
+176;Aluno;1305;LUANA BRUNA DEXTRÉ DA SILVA;LUANA BRUNA DEXTRÉ DA SILVA;   7 ANO ;;;paulo@fundive.com.br;nathalie@fundive.com.br
+177;Aluno;1227;LUCA VALDUGA NOGUEIRA;LUCA VALDUGA NOGUEIRA;   7 ANO ;;;rinogueira@gmail.com;gianini@gmail.com
+178;Aluno;1309;MAILE OLIVEIRA BRAGAGLIA;MAILE OLIVEIRA BRAGAGLIA;   7 ANO ;;;afgutobragaglia@yahoo.com;gabrielafreire13@hotmail.com
+179;Aluno;1247;MARIAH WALTRICK CARNEIRO DA SILVA;MARIAH WALTRICK CARNEIRO DA SILVA;   7 ANO ;;;cristianepapais@gmail.com
+180;Aluno;1246;MIGUEL WAGNER BRAGA;MIGUEL WAGNER BRAGA;   7 ANO ;;;daniellemicheline@hotmail.com
+181;Aluno;1209;SHANTI WALTRICK GARCIA;SHANTI WALTRICK GARCIA;   7 ANO ;;;garcia.aw@gmail.com;flaviarw@gmail.com
+182;Aluno;1304;STELLA MOTTA FANCELLO;STELLA MOTTA FANCELLO;   7 ANO ;;;fancello@grante.ufsc.br;mottacibele@gmail.com
+183;Aluno;1311;THEO MEIRELES DUARTE;THEO MEIRELES DUARTE;   7 ANO ;;;duarte_literatura@yahoo.com.br
+184;Aluno;1335;VALENTINA MOSIMANN BERNARDINI;VALENTINA MOSIMANN BERNARDINI;   7 ANO ;;;rodrigojbernardini@gmail.com;caroline.mosimann@prof.pmf.sc.gov.br
+185;Aluno;1307;VITOR VOLKMER GEMELLI;VITOR VOLKMER GEMELLI;   7 ANO ;;
+186;Aluno;1516;VITÓRIA DE TOLEDO COOKE;VITÓRIA DE TOLEDO COOKE;   7 ANO ;;;fcooke@me.com;madatoledo@gmail.com
+187;Aluno;1353;ACAUÃ FRANCISCO DUARTE ZEN;ACAUÃ FRANCISCO DUARTE ZEN;   8 ANO ;;;grasiela.nutricionista@gmail.com
+188;Aluno;107946;ANA GRAZIELLA BRICARELLO BERNARDES;ANA GRAZIELLA BRICARELLO BERNARDES;   8 ANO ;;;rmbernardes@gmail.com;bricarellopa@yahoo.com.br
+189;Aluno;107539;CLARA PERAO;CLARA PERAO;   8 ANO ;;;gggarcia1012@gmail.com
+190;Aluno;1070;FRANCIELE CAMARGO SOARES;FRANCIELE CAMARGO SOARES;   8 ANO ;;;fraduda8@gmail.com
+191;Aluno;1276;FRANCISCO BOHNEN MONDIN;FRANCISCO BOHNEN MONDIN;   8 ANO ;;;c.mondin@yahoo.com.br;llbohnen@yahoo.com.br
+192;Aluno;1003;GIORDANO HACK BARRETO DARIVA;GIORDANO HACK BARRETO DARIVA;   8 ANO ;;;dariva@gmail.com
+193;Aluno;1426;HENRIQUE CANDEMIL DE OLIVEIRA BUSS GONÇALVES;HENRIQUE CANDEMIL DE OLIVEIRA BUSS GONÇALVES;   8 ANO ;;;mauricio@basisbrasil.com.br;fernandac@brturbo.com.br
+194;Aluno;1243;JOÃO ANTÔNIO BUCHELE GAMA;JOÃO ANTÔNIO BUCHELE GAMA;   8 ANO ;;;gamaphoto@gmail.com;luciana.buchele@gmail.com
+195;Aluno;105269;JOAO PAPINI TONIATTI;JOAO PAPINI TONIATTI;   8 ANO ;;;mariotoniatti@gmail.com;fabiola1366@gmail.com
+196;Aluno;1042;JOÃO SERAFIM;JOÃO SERAFIM;   8 ANO ;;;tomasaserafim@gmail.com;bibianahsousa@gmail.com
+197;Aluno;1459;JOSHUA PAZZANESE SULIVAN;JOSHUA PAZZANESE SULIVAN;   8 ANO ;;;giulianapazzanese@gmail.com
+198;Aluno;102464;LETÍCIA GUIDI DOBROWOLSKI;LETÍCIA GUIDI DOBROWOLSKI;   8 ANO ;;;joao.alexandre@tjsc.jus.br;azg@jfsc.jus.br
+199;Aluno;1389;LETICIA WIDHOLZER DA SILVA;LETICIA WIDHOLZER DA SILVA;   8 ANO ;;;fernando@fernandoserra.com.br;juwidholzer@hotmail.com
+200;Aluno;1009;LIAM DÓNAL RAMSAY;LIAM DÓNAL RAMSAY;   8 ANO ;;;bebhinnramsay@gmail.com
+201;Aluno;107288;LIGIA MIRANDA DE OLIVEIRA;LIGIA MIRANDA DE OLIVEIRA;   8 ANO ;;;jornalistamauriciooliveira@gmail.com;crisfontinha@gmail.com
+202;Aluno;1001;LORENZO SANTOS COLLARES;LORENZO SANTOS COLLARES;   8 ANO ;;;rogerio.a.coll@gmail.com;apbs67@gmail.com
+203;Aluno;1044;LUCA VICENTINI BOGO;LUCA VICENTINI BOGO;   8 ANO ;;;bogo.marcelo@gmail.com;vicentinidan@gmail.com
+204;Aluno;1369;LUCAS FIGUEIRÓ FLEXA;LUCAS FIGUEIRÓ FLEXA;   8 ANO ;;;karinafigueiro@gmail.com
+205;Aluno;1055;MAIA PERES LINDNER;MAIA PERES LINDNER;   8 ANO ;;;betolindner@hotmail.com;pmschu@hotmail.com
+206;Aluno;1242;MARCOS AUGUSTO DOMINGOS MEDEIROS DA SILV;MARCOS AUGUSTO DOMINGOS MEDEIROS DA SILV;   8 ANO ;;;anaba@alceumedeiros.com;ale-domingos@hotmail.com
+207;Aluno;1158;MARIA ANTÔNIA CÓRDOVA WERLANG;MARIA ANTÔNIA CÓRDOVA WERLANG;   8 ANO ;;;claudiofwerlang@gmail.com;mcristinan.cordova@gmail.com
+208;Aluno;1395;MARIANA CRUZZOLINI ALVES;MARIANA CRUZZOLINI ALVES;   8 ANO ;;;claudinecruzzolini@hotmail.com
+209;Aluno;1240;MIGUEL DE FAVERI NECKEL;MIGUEL DE FAVERI NECKEL;   8 ANO ;;;neckel_oliveira@yahoo.com.br;sbfaveri@gmail.com
+210;Aluno;103487;NINA PENTEADO FERNANDES;NINA PENTEADO FERNANDES;   8 ANO ;;;penteado_fernanda@hotmail.com
+211;Aluno;955;PEDRO DE PINHO GOMES;PEDRO DE PINHO GOMES;   8 ANO ;;;guilherme.quintal@gmail.com;quintaldailha@gmail.com
+212;Aluno;1239;PIETRA DE ANDRADE BRETAS GALASTRI;PIETRA DE ANDRADE BRETAS GALASTRI;   8 ANO ;;;fgalastri@yahoo.com.br;gabrielabretas@gmail.com
+213;Aluno;1030;SOLANO SARAIVA KERN;SOLANO SARAIVA KERN;   8 ANO ;;;vmkern@gmail.com;luciana.martins.saraiva@gmail.com
+214;Aluno;1069;TIAGO OLIVEIRA FITTIPALDI BARRA;TIAGO OLIVEIRA FITTIPALDI BARRA;   8 ANO ;;;floripat29@gmail.com
+215;Aluno;108829;VALENTINA NOGUEIRA SILVEIRA;VALENTINA NOGUEIRA SILVEIRA;   8 ANO ;;;tessanogueira@hotmail.com
+216;Aluno;1178;ALICE LIUZZI ZAMBONIM;ALICE LIUZZI ZAMBONIM;   9 ANO ;;;zambonim@epagri.sc.gov.br;aurosliu@gmail.com
+217;Aluno;1093;ANA FERNANDES;ANA FERNANDES;   9 ANO ;;;fabiofnl@yahoo.com.br;ale.esmeraldino@gmail.com
+218;Aluno;107911;ANA LIVIA SILVARES FIORUSSI;ANA LIVIA SILVARES FIORUSSI;   9 ANO ;;;fiorussi@gmail.com
+219;Aluno;108420;ANANDA BRIGNOL RUDLOFF;ANANDA BRIGNOL RUDLOFF;   9 ANO ;;;lilianembrignol@gmail.com
+220;Aluno;1039;ÂNGELO BERSAGUI NETO;ÂNGELO BERSAGUI NETO;   9 ANO ;;;jairbersagui@terra.com.br;soniabersagui@terra.com.br
+221;Aluno;108063;BEATRICE JULIA BEESLEY;BEATRICE JULIA BEESLEY;   9 ANO ;;;safohene@hotmail.com;burnetishbel@gmail.com
+222;Aluno;107849;BENTO ARUNI HARA;BENTO ARUNI HARA;   9 ANO ;;
+223;Aluno;1034;CAROLINA VIEIRA MACHADO;CAROLINA VIEIRA MACHADO;   9 ANO ;;;joaobatista@dba.eng.br;alemachado1006@gmail.com
+224;Aluno;1447;DAVI MATTOS BASSO;DAVI MATTOS BASSO;   9 ANO ;;;alebasso1@gmail.com;liamattoss@gmail.com
+225;Aluno;994;ELIZABETH CHIARELOTTO PALMEIRA;ELIZABETH CHIARELOTTO PALMEIRA;   9 ANO ;;;tlegis@hotmail.com;arivaneaugusta@gmail.com
+226;Aluno;1177;ERIK PALUDO KLONOWSKI;ERIK PALUDO KLONOWSKI;   9 ANO ;;;daniellepaludo@gmail.com
+227;Aluno;938;HELOISA DA SILVA CHAGAS PEREIRA;HELOISA DA SILVA CHAGAS PEREIRA;   9 ANO ;;;engenheiromarcelo@bol.com.br;cynaramusi@gmail.com
+228;Aluno;107814;ISABELLA BIFANO VACCARO;ISABELLA BIFANO VACCARO;   9 ANO ;;;paulovaccaro@piramides.com;marciabifano@hotmail.com
+229;Aluno;1174;JOÃO PEDRO VELLOSO VIANNA;JOÃO PEDRO VELLOSO VIANNA;   9 ANO ;;;nando.vianna@gmail.com;joanavelloso@gmail.com
+230;Aluno;108110;JULIE PFEIFER RAYMUNDO;JULIE PFEIFER RAYMUNDO;   9 ANO ;;;flavius@mormaii.com.br
+231;Aluno;960;LORENZO FONTANIVE BUENO;LORENZO FONTANIVE BUENO;   9 ANO ;;;contato@laprojet.com.br;contato@laprojet.com.br
+232;Aluno;1173;LUCA DUTRA MACKENZIE;LUCA DUTRA MACKENZIE;   9 ANO ;;;tjmackenzie@gmail.com;lulidutra@gmail.com
+233;Aluno;107895;MAIARA DE LARA LUNARDON VARGAS;MAIARA DE LARA LUNARDON VARGAS;   9 ANO ;;;deialaralunardon@gmail.com
+234;Aluno;1199;MARIA DE LUCCA PESSOA;MARIA DE LUCCA PESSOA;   9 ANO ;;;iyengarfloripa@gmail.com;iyengarfloripa@gmail.com
+235;Aluno;1155;MATHEUS BURILLE;MATHEUS BURILLE;   9 ANO ;;;anisioburille@yahoo.com.br;marisajordina@gmail.com
+236;Aluno;1105;MATTEO LEONARDO GYSEL;MATTEO LEONARDO GYSEL;   9 ANO ;;;floripagys@gmail.com;egysel@gmail.com
+237;Aluno;105951;MIGUEL ELIAS ANTONIO SILVA;MIGUEL ELIAS ANTONIO SILVA;   9 ANO ;;;maripaivantonio@gmail.com
+238;Aluno;944;PEDRO DE AGOSTINO NUNES;PEDRO DE AGOSTINO NUNES;   9 ANO ;;;arthur@plotkids.com;daniela.anaba@gmail.com
+239;Aluno;1337;PEDRO LUIZ FLORES CHTERPENSQUE;PEDRO LUIZ FLORES CHTERPENSQUE;   9 ANO ;;;fe.gol@hotmail.com;karine5412@hotmail.com
+240;Aluno;1482;RAUL ROSA BICCA;RAUL ROSA BICCA;   9 ANO ;;;lucasbicca@yahoo.com.br;rosabicca@gmail.com
+241;Aluno;1179;SOFIA LIUZZI ZAMBONIM;SOFIA LIUZZI ZAMBONIM;   9 ANO ;;;zambonim@epagri.sc.gov.br;aurosliu@gmail.com
+242;Aluno;107970;SOFIA MONTEIRO DE BARROS E COUTO;SOFIA MONTEIRO DE BARROS E COUTO;   9 ANO ;;;laurazaniniterapeuta@gmail.com
+243;Aluno;1146;SOFIA NAKATANI;SOFIA NAKATANI;   9 ANO ;;;janakatani@gmail.com;deisesofia@gmail.com
+244;Aluno;1182;TOMAZ LEINDECKER HARDT;TOMAZ LEINDECKER HARDT;   9 ANO ;;;guihardt@hotmail.com;dani@teia.arq.br
+245;Aluno;108250;VITO NOGUTI SILVA;VITO NOGUTI SILVA;   9 ANO ;;;JOAORODRIGOM@GMAIL.COM
+246;Aluno;1342;VITOR NUNES AMARAL;VITOR NUNES AMARAL;   9 ANO ;;;dandasartes@yahoo.com.br;ivana0568@yahoo.com
+1;Aluno;104211;AHIMSA FARIA BASSI;AHIMSA FARIA BASSI;   10 ANO ;;;enanodailha@gmail.com;mamilalita@gmail.com
+2;Aluno;1478;AMANDA MARCHI;AMANDA MARCHI;   10 ANO ;;;michele.e.march@gmail.com;alevidazen@gmail.com
+3;Aluno;101883;ANA GABRIELA MOREIRA MARAGNO;ANA GABRIELA MOREIRA MARAGNO;   10 ANO ;;;gogliardo@maragno.arq.br;angelapmm@hotmail.com
+4;Aluno;924;ARTHUR RABELO SUPLICI;ARTHUR RABELO SUPLICI;   10 ANO ;;;luciosuplici@terra.com.br;samara.eliane@terra.com.br
+5;Aluno;1121;CAROLINA BÚRIGO ALBERTAL;CAROLINA BÚRIGO ALBERTAL;   10 ANO ;;;malbertal@gmail.com;audreyglobal@gmail.com
+6;Aluno;1130;CLARA VIANNA PIRES PAULUCI;CLARA VIANNA PIRES PAULUCI;   10 ANO ;;;guilhermebbp71@gmail.com;cmpires@gmail.com
+7;Aluno;103550;ELI DIAZ NAVARRO;ELI DIAZ NAVARRO;   10 ANO ;;;rdiaz@biotienda.com.mx;georgina.navarro78@gmail.com
+8;Aluno;1235;ISABELLA CHARLOTTE HOFFMANN MORRIS;ISABELLA CHARLOTTE HOFFMANN MORRIS;   10 ANO ;;;hoffmannsa@hotmail.com
+9;Aluno;1037;LAURA MARGARITA BOHRER DUVIDOVICH;LAURA MARGARITA BOHRER DUVIDOVICH;   10 ANO ;;;marcelo@surlivro.com.br;ml.joaquina@gmail.com
+10;Aluno;856;LAURA PRADE DE MESQUITA;LAURA PRADE DE MESQUITA;   10 ANO ;;;gjprade@gmail.com
+11;Aluno;108891;LAVINIA TRAMONTINA PAPAGEORGOPOULOS;LAVINIA TRAMONTINA PAPAGEORGOPOULOS;   10 ANO ;;
+12;Aluno;922;MARIA ANTONIA HENICKA DE SOUZA;MARIA ANTONIA HENICKA DE SOUZA;   10 ANO ;;;desouza.acacio@gmail.com;marli.henicka@gmail.com
+13;Aluno;1076;MARIA EDUARDA CAMARGO SOARES;MARIA EDUARDA CAMARGO SOARES;   10 ANO ;;;fraduda8@gmail.com
+14;Aluno;104181;MARIA ELIS PEREIRA DE CARVALHO;MARIA ELIS PEREIRA DE CARVALHO;   10 ANO ;;;vicentegambe@gmail.com;marialenep@univali.br
+15;Aluno;104157;NIKOLE KOURJIAN;NIKOLE KOURJIAN;   10 ANO ;;;razmikwood@gmail.com;serenavivaz@gmail.com
+16;Aluno;1134;PABLO BUENO ROESLER;PABLO BUENO ROESLER;   10 ANO ;;;crroesler@gmail.com;daisybueno@gmail.com
+17;Aluno;1137;PABLO DALLA PRIA B. DE M. V. C. SANTOS;PABLO DALLA PRIA B. DE M. V. C. SANTOS;   10 ANO ;;;celiamvsiqueira@gmail.com;celiamvsiqueira@gmail.com
+18;Aluno;108080;PEDRO ISNARDI NOVAES;PEDRO ISNARDI NOVAES;   10 ANO ;;;carlosnovaes@inb.gov.br;bubuisnardi@hotmail.com
+19;Aluno;1133;SERENA FELSSNER ZANINI;SERENA FELSSNER ZANINI;   10 ANO ;;;kleylagoa@gmail.com;zanini7@gmail.com
+20;Aluno;1455;SOFIA FOGAÇA GOMES;SOFIA FOGAÇA GOMES;   10 ANO ;;;jefferson@softnex.com.br;talitafogaca30@gmail.com
+21;Aluno;104637;TEO DE BARROS FERREIRA ALVES;TEO DE BARROS FERREIRA ALVES;   10 ANO ;;;fabiana.comunique@gmail.com
+22;Aluno;1045;ALOIS VICENTINI BOGO;ALOIS VICENTINI BOGO;   11 ANO ;;;bogo.marcelo@gmail.com;vicentinidan@gmail.com
+23;Aluno;824;AMANDA DA SILVA CHAGAS PEREIRA;AMANDA DA SILVA CHAGAS PEREIRA;   11 ANO ;;;engenheiromarcelo@bol.com.br;cynaramusi@gmail.com
+24;Aluno;1071;BEATRIZ AFONSO CAMPOS;BEATRIZ AFONSO CAMPOS;   11 ANO ;;;patica1@gmail.com
+25;Aluno;1148;CAMILA SIMON ROVARIS;CAMILA SIMON ROVARIS;   11 ANO ;;;danielangeloni.rovaris@gmail.com;andrezarovaris@yahoo.com.br
+26;Aluno;105323;CATARINA ALVES DA SILVA;CATARINA ALVES DA SILVA;   11 ANO ;;;denisea04@gmail.com
+27;Aluno;104777;CECÍLIA ALBRECHT NICODEMUS;CECÍLIA ALBRECHT NICODEMUS;   11 ANO ;;;niconicodemus@hotmail.com;kantine8@gmail.com
+28;Aluno;1103;FRANCISCO BITTAR FIAMMENGHI;FRANCISCO BITTAR FIAMMENGHI;   11 ANO ;;;lhfiaminghi@yahoo.com.br;anima@animamusica.art.br
+29;Aluno;104955;GABRIELA MUSSINI FERREIRA;GABRIELA MUSSINI FERREIRA;   11 ANO ;;;rodrigopretto@gmail.com;mariela_mu@hotmail.com
+30;Aluno;107741;GUIDO MACHADO VIVAN;GUIDO MACHADO VIVAN;   11 ANO ;;;martha_machado@yahoo.com.br
+31;Aluno;108608;JOÃO PEDRO BORGES ALBERTON;JOÃO PEDRO BORGES ALBERTON;   11 ANO ;;;ALBERTONRL@GMAIL.COM;KARENWALTRICK@GMAIL.COM
+32;Aluno;104289;JULIA GONCALVES LÔPO;JULIA GONCALVES LÔPO;   11 ANO ;;;claudiolopo@yahoo.com.br;simone.lopo@gmail.com
+33;Aluno;935;LIZ SANTOS COLLARES;LIZ SANTOS COLLARES;   11 ANO ;;;rogerio.a.coll@gmail.com;apbs67@gmail.com
+34;Aluno;1465;LUCAS BRASIL CORRÊA;LUCAS BRASIL CORRÊA;   11 ANO ;;;alvaror.correa@gmail.com;ctctur@outlook.com
+35;Aluno;1409;MANUELA NEVES PASTI MIONI;MANUELA NEVES PASTI MIONI;   11 ANO ;;;dpmioni@gmail.com;sarahvilhena@hotmail.com
+36;Aluno;807;MARIAH RODRIGUES S. RITA;MARIAH RODRIGUES S. RITA;   11 ANO ;;;renato@siqlo.com.br;kelenrssilva@gmail.com
+37;Aluno;1091;MARINA PACIULLI VARVAKIS;MARINA PACIULLI VARVAKIS;   11 ANO ;;;gvarvakis@hotmail.com;soniaraffa@yahoo.com
+38;Aluno;1412;MAYARA GUIDINI CARVALHO;MAYARA GUIDINI CARVALHO;   11 ANO ;;;guidini@usa.com;yaraguidini@hotmail.com
+39;Aluno;102677;PEDRO INDRA HAK DE OLIVEIRA;PEDRO INDRA HAK DE OLIVEIRA;   11 ANO ;;;eltano@hotmail.com;pedro.indra@hotmail.com
+40;Aluno;928;RAQUEL SCHWEITZER CAVAGNOLI;RAQUEL SCHWEITZER CAVAGNOLI;   11 ANO ;;;cristinaschweitzer@hotmail.com
+41;Aluno;1139;SOFIA KOETZ MEYER;SOFIA KOETZ MEYER;   11 ANO ;;;felipeafmeyer@terra.com.br
+42;Aluno;910;SOFIA MACIEL TRATZ;SOFIA MACIEL TRATZ;   11 ANO ;;;ivan.tratz@gmail.com;monicatratz@gmail.com
+43;Aluno;1088;SOFIA SANTIAGO SILVA GONTIJO;SOFIA SANTIAGO SILVA GONTIJO;   11 ANO ;;;gabrielgontijonyc@gmail.com;santiago.estela@gmail.com
+44;Aluno;107423;TOMAS VIVIANI DE AQUINO;TOMAS VIVIANI DE AQUINO;   11 ANO ;;;antoniofelipeaquino25@gmail.com;taiana.viviani@gmail.com
+45;Aluno;1023;ANDRÉ REIMANN MATOS;ANDRÉ REIMANN MATOS;   12 ANO ;;;mia.matos@hotmail.com;kukyr@yahoo.com.br
+46;Aluno;1060;DARUAN VIEIRA LORENZEN;DARUAN VIEIRA LORENZEN;   12 ANO ;;;reikisantinho@hotmail.com
+47;Aluno;838;JOANA FRITZEN PEREIRA;JOANA FRITZEN PEREIRA;   12 ANO ;;;saulope007@yahoo.com.br;adrianafritzen@yahoo.com.br
+48;Aluno;1281;JOÃO IOSHIO MASUKAWA DE SOUZA;JOÃO IOSHIO MASUKAWA DE SOUZA;   12 ANO ;;;scih.hnr@gmail.com;ivetemasukawa@gmail.com
+49;Aluno;1397;JOÃO VICENTE MULLER SCHERER;JOÃO VICENTE MULLER SCHERER;   12 ANO ;;;inez-muller@hotmail.com;inez-muller@hotmail.com
+50;Aluno;867;LARA PALO BORGES;LARA PALO BORGES;   12 ANO ;;;marcosreco@gmail.com;marta.palo337@gmail.com
+51;Aluno;876;LARISSA SHANTI FONSECA PITTA;LARISSA SHANTI FONSECA PITTA;   12 ANO ;;;danilo_pitta@yahoo.com.br;danilo_pitta@yahoo.com.br
+52;Aluno;925;LAURA PAULINI RABELO SUPLICI;LAURA PAULINI RABELO SUPLICI;   12 ANO ;;;luciosuplici@terra.com.br;samara.eliane@terra.com.br
+53;Aluno;1522;LETÍCIA MENDES DUARTE;LETÍCIA MENDES DUARTE;   12 ANO ;;;gusmagia@hotmail.com;danipfmendes@hotmail.com
+54;Aluno;1202;LETÍCIA RAMOS COSTA;LETÍCIA RAMOS COSTA;   12 ANO ;;;emilianeramos@gmail.com
+55;Aluno;1220;LORENA VARALLA SCANSANI;LORENA VARALLA SCANSANI;   12 ANO ;;;daraca1@gmail.com
+56;Aluno;1458;LUCAS FERREIRA LEVI;LUCAS FERREIRA LEVI;   12 ANO ;;;gabriel_levi3@hotmail.com;liapferreira@hotmail.com
+57;Aluno;1108;MARIA CLARA BARRETTA GONÇALVES LOPES;MARIA CLARA BARRETTA GONÇALVES LOPES;   12 ANO ;;;jricardolopes@hotmail.com;annecarolllopes@gmail.com
+58;Aluno;874;PEDRO ECKSCHMIDT BUSO;PEDRO ECKSCHMIDT BUSO;   12 ANO ;;;giam@paripassu.com.br;sandra.eckschmidt@gmail.com.br
+59;Aluno;1371;TEO FIGUEIRÓ BRASIL DE CARVALHO;TEO FIGUEIRÓ BRASIL DE CARVALHO;   12 ANO ;;;moubrasil@hotmail.com;karinafigueiro@gmail.com
+60;Aluno;1021;TIAGO DEXTRÉ DA SILVA;TIAGO DEXTRÉ DA SILVA;   12 ANO ;;;paulo@fundive.com.br;nathalie@fundive.com.br
+61;Aluno;1477;VALENTINA MOREIRA MONTEIRO;VALENTINA MOREIRA MONTEIRO;   12 ANO ;;;annabarbosa2@hotmail.com
+62;Aluno;101646;VITOR COSTA DIAS;VITOR COSTA DIAS;   12 ANO ;;;ibsem.dias@gmail.com
+63;Aluno;1047;VITOR PASSOS NICOLODI;VITOR PASSOS NICOLODI;   12 ANO ;;;jcnicolodi@yahoo.com.br;ntcmainah@yahoo.com.br
+64;Aluno;101913;WILLOW ANN BEESLEY;WILLOW ANN BEESLEY;   12 ANO ;;;safohene@hotmail.com;burnetishbel@gmail.com

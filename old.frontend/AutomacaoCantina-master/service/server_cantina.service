@@ -1,0 +1,9 @@
+[Unit]
+Description=Sever Cantina
+
+[Service]
+ExecStart=/home/ubuntu/AutomacaoCantina/server/serverCantina.py
+Restart=always
+
+[Install]
+WantedBy=default.target

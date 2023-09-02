@@ -1,0 +1,9 @@
+[Unit]
+Description=Controle Cantina
+
+[Service]
+ExecStart=/home/pi/AutomacaoCantina/almoco/controleBarCode.py
+Restart=always
+
+[Install]
+WantedBy=default.target

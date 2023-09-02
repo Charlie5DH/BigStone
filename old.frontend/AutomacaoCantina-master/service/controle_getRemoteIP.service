@@ -1,0 +1,9 @@
+[Unit]
+Description=Controle Cantina - getRemoteIp
+
+[Service]
+ExecStart=/home/ubuntu/AutomacaoCantina/almoco/getRemoteIp.py
+Restart=always
+
+[Install]
+WantedBy=default.target

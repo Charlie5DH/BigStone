@@ -1,0 +1,9 @@
+[Unit]
+Description=Controle de Registro de Lanches da Cantina
+
+[Service]
+ExecStart=/home/ubuntu/AutomacaoCantina/almoco/controleLanche.py
+Restart=always
+
+[Install]
+WantedBy=default.target

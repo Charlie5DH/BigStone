@@ -1,0 +1,155 @@
+#!/usr/bin/python
+
+"""
+Save this file as server.py
+>>> python server.py 0.0.0.0 8001
+serving on 0.0.0.0:8001
+
+or simply
+
+>>> python server.py
+Serving on localhost:8000
+
+You can use this to test GET and POST methods.
+
+"""
+
+import SimpleHTTPServer
+import SocketServer
+import logging
+import cgi
+import pwd
+import grp
+import datetime
+import sys
+# import MySQLdb
+import os, sys, glob, datetime
+import datetime
+import urllib
+import json
+import fcntl
+import struct
+import socket
+from _reg_data_file import *
+from db_data import *
+from process_data import *
+import MySQLdb
+import csv
+
+class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+
+	def do_GET(self):
+		logging.warning("======= GET STARTED =======")
+		print ("======= GET STARTED =======")
+		logging.warning(self.headers)
+		SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+
+	def _set_headers(self):
+		self.send_response(200)
+		self.send_header('Content-type', 'text/html')
+		self.end_headers()
+
+
+	def do_POST(self):
+		try:
+			length = int(self.headers.getheader('content-length'))
+
+			data = self.rfile.read(length)
+			self.send_response(200, "OK")
+			self._set_headers()
+
+			print "DATA: ", data
+			cmd = ""
+			if len(data) < 100: 
+				cmd,table=data.split(":")
+
+			if cmd == "IMPORTAR":
+				print "Recebido comando: ", data
+				j = self.transmite_tabela_dados(table)
+				print j
+				self.wfile.write(j)
+			else:
+				self.wfile.write("Dados recebidos com sucesso")
+				self.processa_dados_recebidos(data)
+
+			self.finish()
+		except Exception as exc:
+			logging.error("{0}/{1}({2})".format(type(self).__name__, type(exc).__name__, str(exc)))
+
+	def transmite_tabela_dados(self, table):
+		return proc.getDataTable(table)
+
+	def processa_dados_recebidos(self, data):
+		json_data = json.loads(data)
+		for table, value in json_data.items():
+			proc.processa_tabela(table,value)
+			self.salva_db_arq_csv(table)
+
+	def salva_db_arq_csv (self, table):
+		dados = proc.getDataTableToCsv(table)
+
+def get_ip_address(ifname):
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	return socket.inet_ntoa(fcntl.ioctl(s.fileno(),0x8915,struct.pack('256s', ifname[:15]))[20:24])
+
+def get_data_from_file(file_name, typef):
+	try:
+		with open(file_name) as data_file:
+			if typef == "json":
+				json_data = json.load(data_file)
+       
+				for table, value in json_data.items():
+					proc.processa_tabela(table,value)
+			elif typef == "csv":
+				reader = csv.reader(data_file)
+				for value in reader:
+					proc.processa_tabela("Clientes",value)
+
+	except:
+		print "Erro na abetura do arquivo: ", file_name
+
+####
+
+#
+# Inicio
+#
+
+print "Iniciando server: ", sys.argv[0], len(sys.argv)
+cmd_param = ""
+if len(sys.argv) == 2:
+	cmd_param = sys.argv[1]
+	print "Comando via parametro: ", cmd_param
+	
+Handler = ServerHandler
+
+#interface="enp2s0"
+#interface="wlp1s0"
+interface="eth0"
+PORT=4567
+
+ip = get_ip_address(interface);
+print "Escutando na interface ", interface, " ip: ", ip, " port: ", PORT
+httpd = SocketServer.TCPServer((ip, PORT), Handler)
+
+proc = ProcessaDados()
+if cmd_param == "CARREGAR_ARQUIVOS":
+	print "Carregar arquivos..."
+	get_data_from_file("Entradas_Registradas.json","json")
+	get_data_from_file("Produtos.json","json")
+	get_data_from_file("Clientes.json","json")
+	get_data_from_file("Tipo_Clientes.json","json")
+	get_data_from_file("Configuracao.json","json")
+
+elif cmd_param == "DROP_DB":
+	print "Drop DB...."
+	proc.DropAllDB()	
+
+elif cmd_param == "CARREGAR_LISTA_ALUNOS":
+	print "Carregar lista de alunos...."
+	get_data_from_file("lista_alunos_anaba_2017.csv","csv")
+
+try:
+	httpd.serve_forever()
+except KeyboardInterrupt:
+	pass
+httpd.server_close()
