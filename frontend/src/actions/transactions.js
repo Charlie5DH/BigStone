@@ -13,10 +13,10 @@ import {
   GET_TRANSACTIONS_SUMMARY_BY_CLIENT,
 } from "../constants/transactions";
 
-export const getTransactions = (transaction_type) => async (dispatch) => {
+export const getTransactions = (transaction_type, start_timestamp, end_timestamp) => async (dispatch) => {
   try {
     dispatch({ type: LOADING_TRANSACTIONS });
-    const { data } = await api.getTransactions(transaction_type);
+    const { data } = await api.getTransactions(transaction_type, start_timestamp, end_timestamp);
     dispatch({ type: GET_TRANSACTIONS, payload: data });
     dispatch({ type: END_LOADING_TRANSACTIONS });
   } catch (error) {
@@ -37,10 +37,8 @@ export const getTransactionById = (id) => async (dispatch) => {
 
 export const createTransaction = (newTransaction) => async (dispatch) => {
   try {
-    dispatch({ type: LOADING_TRANSACTIONS });
     const { data } = await api.createTransaction(newTransaction);
     dispatch({ type: CREATE_TRANSACTION, payload: data });
-    dispatch({ type: END_LOADING_TRANSACTIONS });
   } catch (error) {
     console.log(error);
   }

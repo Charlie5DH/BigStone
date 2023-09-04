@@ -11,13 +11,15 @@ const TotalSummary = ({ transactionsSummary, items, activateDropdown = true, wid
           <span className="text-slate-500 font-secondary font-normal text-14">Total de vendas</span>
         </div>
         <div className="flex flex-col border rounded-md p-3 w-full">
-          <span className="text-slate-700 font-secondary font-normal text-20">$R {transactionsSummary.total_made}</span>
+          <span className="text-slate-700 font-secondary font-normal text-20">
+            $R {Number(transactionsSummary.total_made).toFixed(2)}
+          </span>
           <div id="divider" className="border-b my-2"></div>
           <span className="text-slate-500 font-secondary font-normal text-14">Lucro total</span>
         </div>
         <div className="flex flex-col border rounded-md p-3 w-full">
           <span className="text-slate-700 font-secondary font-normal text-20">
-            $R {transactionsSummary.total_by_meal}
+            $R {Number(transactionsSummary.total_by_meal).toFixed(2)}
           </span>
           <div id="divider" className="border-b my-2"></div>
           <span className="text-slate-500 font-secondary font-normal text-14">Total por refeição</span>

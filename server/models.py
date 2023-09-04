@@ -220,8 +220,8 @@ class Transaction(BaseModel):
     transaction_type: str = Field(
         "sell", description="Type of the transaction", example="buy")
 
-    # current_weight: float = Field(
-    #     0, description="Current weight of the dish", example=0.0)
+    weight: float = Field(
+        0, description="Current weight of the dish", example=0.0)
     kg_price: float = Field(
         0, description="Price per kilogram of the dish", example=0.0)
     meal_price: float = Field(
@@ -247,13 +247,14 @@ class Transaction(BaseModel):
             "example": {
                 "client_id": "64d2f0cd47614dfdea47e246",
                 "rfid": "333907a32a974752869d7022183d6608",
-                "type": "buy",
+                "transaction_type": "sell",
                 "items": [
                     {
                         "item_id": "64e8b1ea5bfcceebd893d707",
                         "quantity": 5
                     }
                 ],
-                "kg_price": 0
+                "kg_price": 0,
+                "weight": 0,
             }
         }

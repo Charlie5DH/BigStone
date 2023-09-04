@@ -32,7 +32,8 @@ const reducer = (
     case GET_TRANSACTIONS_SUMMARY_BY_CLIENT:
       return { ...state, transactionsSummaryByClient: action.payload };
     case CREATE_TRANSACTION:
-      return { ...state, transactions: [...state.transactions, action.payload] };
+      // add new transaction to the state as first element
+      return { ...state, transactions: [action.payload, ...state.transactions] };
     case UPDATE_TRANSACTION:
       return {
         ...state,

@@ -207,21 +207,25 @@ const DailySummary = ({ transactionsSummary, items, activateDropdown = true, wid
                transaction.total_made > 0 ? "text-slate-500 font-light" : "text-red-400 font-normal"
              }`}
               >
-                <span className="font-display text-14">$R {transaction.total_made}</span>
+                <span className="font-display text-14">$R {Number(transaction.total_made).toFixed(2)}</span>
               </div>
 
               <div
                 className="lg:flex hidden items-center justify-center gap-1 text-slate-500
              hover:text-slate-400 duration-200 border-l"
               >
-                <span className="text-slate-500 font-display font-light text-14">$R {transaction.total_by_meal}</span>
+                <span className="text-slate-500 font-display font-light text-14">
+                  $R {Number(transaction.total_by_meal).toFixed(2)}
+                </span>
               </div>
 
               <div
                 className="lg:flex hidden items-center justify-center gap-1 text-slate-500
              hover:text-slate-400 duration-200 border-l"
               >
-                <span className="text-slate-500 font-display font-light text-14">{transaction.total_by_item}</span>
+                <span className="text-slate-500 font-display font-light text-14">
+                  $R {Number(transaction.total_by_item).toFixed(2)}
+                </span>
               </div>
 
               <div

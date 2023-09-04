@@ -5,12 +5,19 @@ import Checkbox from "../Inputs/Checkbox";
 import { TiArrowSortedDown, TiArrowSortedUp, TiArrowUnsorted } from "react-icons/ti";
 import { IoMdTime } from "react-icons/io";
 import { MdOutlineKeyboardDoubleArrowDown } from "react-icons/md";
+import moment from "moment";
+import "moment/locale/pt-br"; // Import Portuguese locale
+
+// Optionally, you can set the locale globally for your application
+moment.locale("pt-br");
 
 const RecordsList = ({ records, produtos }) => {
   const [sort, setSort] = React.useState(0);
   const [sortedRecords, setSortedRecords] = React.useState(records);
   const [selected, setSelected] = React.useState([]);
-  const [activeDropdown, setActiveDropdown] = React.useState({});
+  const [activeDropdown, setActiveDropdown] = React.useState({
+    0: 1,
+  });
 
   React.useEffect(() => {
     setSortedRecords(records);
@@ -66,37 +73,8 @@ const RecordsList = ({ records, produtos }) => {
                   font="font-normal"
                   icon={undefined}
                 />
-                <span className="text-[13px] font-normal text-slate-500">Total do dia:</span>
-                <span
-                  className={`font-display font-semibold text-14 ${
-                    sortedRecords
-                      .filter((row) => row.timestamp.split("T")[0] === new Date().toISOString().split("T")[0])
-                      .reduce((acc, row) => acc + row.meal_price, 0) > 0
-                      ? "text-emerald-500"
-                      : "text-amber-400"
-                  }`}
-                >
-                  {
-                    // meal_price of the day (sum of all meal_price filtering by timestamp)
-                    sortedRecords
-                      .filter((row) => row.timestamp.split("T")[0] === new Date().toISOString().split("T")[0])
-                      .reduce((acc, row) => acc + row.meal_price, 0) || 0
-                  }
-                </span>
-                <div className="flex flex-wrap gap-1">
-                  <p className="text-gray-500 font-display font-medium text-12">Total ontem</p>
-                  <span className="font-display font-semibold text-indigo-500 text-14">
-                    {
-                      // meal_price of yesterday (sum of all meal_price filtering by timestamp)
-                      sortedRecords
-                        .filter(
-                          (row) =>
-                            row.timestamp.split("T")[0] ===
-                            new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split("T")[0]
-                        )
-                        .reduce((acc, row) => acc + row.meal_price, 0) || 0
-                    }
-                  </span>
+                <div className="flex flex-wrap items-start gap-1">
+                  <p className="text-slate-500 font-display font-normal text-[13px]">Transações dos clientes</p>
                 </div>
               </div>
             </div>
@@ -149,7 +127,7 @@ const RecordsList = ({ records, produtos }) => {
             }}
             className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l"
           >
-            <span className="text-[13px] font-normal">Peso da Refeição (KG)</span>
+            <span className="text-[13px] font-normal">Peso da Refeição</span>
             {sort === 0 ? (
               <TiArrowUnsorted className="text-16 font-normal" />
             ) : sort === 1 ? (
@@ -235,11 +213,7 @@ const RecordsList = ({ records, produtos }) => {
           <div
             key={index}
             className={`flex flex-col gap-y-1 w-full px-3 py-2 duration-200
-            ${
-              record.quantity === 0
-                ? "border border-amber-100 bg-amber-50 hover:bg-yellow-50"
-                : "border-t hover:bg-slate-50"
-            }`}
+            ${index === 0 ? "border border-indigo-200 shadow-sm shadow-indigo-200" : "border-t hover:bg-slate-50"}`}
           >
             <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 xl:grid-cols-10 items-center justify-between">
               <div className="flex items-center col-span-2 lg:col-span-2 xl:col-span-3 cursor-pointer">
@@ -278,21 +252,23 @@ const RecordsList = ({ records, produtos }) => {
                 className="lg:flex hidden items-center justify-center gap-1 text-slate-500
              hover:text-slate-400 duration-200 border-l"
               >
-                <span className="text-slate-500 font-display font-light text-14">$R {record.meal_price}</span>
+                <span className="text-slate-500 font-display font-light text-14">
+                  $R {Number(record.meal_price).toFixed(1)}
+                </span>
               </div>
 
               <div
                 className="lg:flex lg:flex-col gap-y-1 hidden items-center justify-center gap-1 text-slate-500
              hover:text-slate-400 duration-200 border-l"
               >
-                <span className="text-slate-500 font-display font-light text-14">{record.weight}</span>
+                <span className="text-slate-500 font-display font-light text-14">{record.weight} Kg</span>
               </div>
 
               <div
                 className="lg:flex hidden items-center justify-center gap-1 text-slate-500
              hover:text-slate-400 duration-200 border-l col-span-1"
               >
-                <span className="text-slate-500 font-display font-light text-14">{record.kg_price}</span>
+                <span className="text-slate-500 font-display font-light text-14">$R {record.kg_price}</span>
               </div>
 
               <div
@@ -307,7 +283,7 @@ const RecordsList = ({ records, produtos }) => {
              hover:text-slate-400 duration-200 border-l col-span-1"
               >
                 <span className="text-slate-500 font-display font-light text-14">
-                  {record.items.reduce((acc, item) => acc + item.price * item.quantity, 0)}
+                  $R {record.items.reduce((acc, item) => acc + item.price * item.quantity, 0)}
                 </span>
               </div>
 
@@ -315,30 +291,27 @@ const RecordsList = ({ records, produtos }) => {
                 className="lg:flex hidden items-center justify-center gap-1 text-slate-500
              hover:text-slate-400 duration-200 border-l col-span-1"
               >
-                <span className="text-slate-500 font-display font-light text-14">{record.total}</span>
+                <span className="text-slate-500 font-display font-light text-14">
+                  $R {Number(record.total).toFixed(1)}
+                </span>
               </div>
 
               <div
                 className="lg:flex hidden items-center justify-center gap-1 text-slate-500
              hover:text-slate-400 duration-200 border-l"
               >
-                <span className="text-14 font-normal">
-                  {record.timestamp.split(" ").length === 1
-                    ? record.timestamp.split("T")[0]
-                    : record.timestamp.split(" ")[0]}
-                </span>
+                <span className="text-14 font-normal">{moment(record.timestamp).format("lll")}</span>
               </div>
             </div>
             {activeDropdown[index] && (
-              <div className="flex flex-col gap-y-1 px-3 py-2 duration-200 ml-6 border-t">
-                <span className="text-14 font-medium text-slate-700">Produtos vendidos</span>
+              <div className="flex flex-col gap-y-1 px-3 py-2 duration-200 mt-2">
                 <div className="flex flex-col items-center border rounded-md w-full my-1">
                   <div
                     className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 w-full items-center
          justify-between p-3 bg-slate-100"
                   >
                     <div className="flex items-start col-span-2 lg:col-span-3 xl:col-span-3">
-                      <span className="flex items-center gap-2 text-[13px] font-normal text-slate-500">Nome</span>
+                      <span className="text-14 font-medium text-slate-600">Produtos vendidos</span>
                     </div>
 
                     <div
@@ -349,13 +322,12 @@ const RecordsList = ({ records, produtos }) => {
                     </div>
 
                     <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l">
-                      <span className="text-[13px] font-normal">Disponível</span>
+                      <span className="text-[13px] font-normal">Vendidos</span>
                     </div>
                   </div>
 
-                  {produtos
-                    .filter((produto) => record.items.map((item) => item.item_id).includes(produto._id))
-                    .map((produto, index) => (
+                  {record.items.length > 0 &&
+                    record.items.map((produto, index) => (
                       <div
                         key={index}
                         className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 w-full items-center justify-between p-3 bg-slate-100 border-t"
@@ -363,13 +335,17 @@ const RecordsList = ({ records, produtos }) => {
                         <div className="flex items-start col-span-2 lg:col-span-3 xl:col-span-3">
                           <div className="flex items-center">
                             <img
-                              src={`http://localhost:8003/api/get_image/${produto.image}`} //"https://placehold.co/600x400" ||
+                              src={`http://localhost:8003/api/get_image/${
+                                produtos.find((e) => e._id === produto.item_id).image
+                              }`} //"https://placehold.co/600x400" ||
                               alt="produto"
                               className="rounded-md shadow-sm w-16 h-16 object-cover"
                             />
                             <div className="flex flex-col gap-y-1 ml-4">
                               <span className="text-14 font-medium text-slate-700">{produto.name}</span>
-                              <span className="text-12 font-normal text-slate-500">{produto.description}</span>
+                              <span className="text-12 font-normal text-slate-500">
+                                {produtos.find((e) => e._id === produto.item_id).description}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -377,7 +353,9 @@ const RecordsList = ({ records, produtos }) => {
                           className="lg:flex hidden items-center justify-center gap-1 text-slate-500
            hover:text-slate-400 duration-200 border-l"
                         >
-                          <span className="text-12 font-normal text-slate-500">{produto.price}</span>
+                          <span className="text-12 font-normal text-slate-500">
+                            {produtos.find((e) => e._id === produto.item_id).price}
+                          </span>
                         </div>
                         <div
                           className="lg:flex hidden items-center justify-center gap-1 text-slate-500

@@ -4,7 +4,7 @@ import json
 from fastapi import FastAPI, File, UploadFile
 from datetime import datetime
 from datetime import timedelta
-from fastapi import FastAPI, HTTPException, status, APIRouter
+from fastapi import FastAPI, HTTPException, status, APIRouter, WebSocket
 from fastapi.responses import JSONResponse, Response, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
@@ -46,6 +46,61 @@ else:
     last_kg_price = kg_price_collection.find_one(
         sort=[("timestamp", pymongo.DESCENDING)])
     KG_PRICE = last_kg_price["kg_price"]
+
+
+# Store WebSocket clients in a set
+websocket_clients = set()
+
+# Function to send data to all WebSocket clients
+
+
+async def send_data_to_clients(data):
+    for client in websocket_clients:
+        await client.send(data)
+
+# WebSocket route to handle incoming WebSocket connections
+
+
+@app.websocket("/ws/weight")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    websocket_clients.add(websocket)
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            # You can process the received data here if needed.
+            await send_data_to_clients(data)
+    except Exception as e:
+        print(f"WebSocket connection closed with error: {e}")
+    finally:
+        websocket_clients.remove(websocket)
+
+
+@app.post("/api/current_dish_weight/{weight}", tags=["weight"])
+async def current_dish_weight(weight: float):
+    ''' API for setting the current weight of the dish
+
+    Attributes:
+        weight(float): Current weight of the dish.
+
+    The weight field is used to identify the current weight of the dish.
+
+    Save the current weight in the database for future reference
+    '''
+
+    global CURRENT_WEIGHT
+    CURRENT_WEIGHT = weight
+
+    for client in websocket_clients:
+        message = {"type": "json", "message": "new_weight", "weight": weight}
+        await client.send_json(message)
+
+    # save the current weight in the database for future reference
+    weights_collection.insert_one(
+        {"weight": weight, "timestamp": datetime.now().isoformat()})
+
+    return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(weight, default=convert_object_id)))
 
 
 @app.get("/test")
@@ -234,27 +289,6 @@ async def grant_access(rfid: str):
             status_code=404, detail="Client not found. It must be created first.")
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(client_data, default=convert_object_id)))
-
-
-@app.post("/api/current_dish_weight/{weight}", tags=["weight"])
-async def current_dish_weight(weight: float):
-    ''' API for getting the current weight of the dish
-
-    Attributes:
-        weight(float): Current weight of the dish.
-
-    The weight field is used to identify the current weight of the dish.
-
-    Save the current weight in the database for future reference
-    '''
-    global CURRENT_WEIGHT
-    CURRENT_WEIGHT = weight
-
-    # save the current weight in the database for future reference
-    weights_collection.insert_one(
-        {"weight": weight, "timestamp": datetime.now().isoformat()})
-
-    return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(weight, default=convert_object_id)))
 
 
 @app.get("/api/get_current_weight", tags=["weight"])
@@ -617,12 +651,15 @@ async def update_many_items(ids: List[str], item: dict):
 # Transaction API
 ##########################################################################################
 
-@app.get("/api/transactions/{transaction_type}", tags=["transactions"])
+@app.get("/api/transactions/{transaction_type}/{start_timestamp}/{end_timestamp}", tags=["transactions"])
 async def get_transactions(transaction_type: str, start_timestamp: str = None, end_timestamp: str = None, limit: int = 0, skip: int = 0):
     '''
     API for getting all transactions
 
     Filter transactions by type: "sell", "stock", "clear_debt", "all"
+
+    start_timestamp and end_timestamp must be in the format: YYYY-MM-DD and the timestamp in the database
+    is in the format: YYYY-MM-DDTHH:MM:SS
     '''
 
     if transaction_type == "all":
@@ -630,14 +667,16 @@ async def get_transactions(transaction_type: str, start_timestamp: str = None, e
     else:
         filter_for_transaction_type = {"transaction_type": transaction_type}
 
+    print("start_timestamp", start_timestamp)
+    print("end_timestamp", end_timestamp)
+
     if start_timestamp is not None and end_timestamp is not None:
-        start_timestamp = datetime.fromisoformat(start_timestamp)
-        end_timestamp = datetime.fromisoformat(end_timestamp)
+
         transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": start_timestamp}}, {
             "timestamp": {"$lte": end_timestamp}}, filter_for_transaction_type]}).skip(skip).limit(limit).sort("timestamp", pymongo.DESCENDING))
     else:
-        transactions = list(
-            transactions_collection.find(filter_for_transaction_type).skip(skip).limit(limit).sort("timestamp", pymongo.DESCENDING))
+        transactions = list(transactions_collection.find(
+            filter_for_transaction_type).skip(skip).limit(limit).sort("timestamp", pymongo.DESCENDING))
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(transactions, default=convert_object_id)))
 
@@ -736,6 +775,10 @@ async def get_transactions_by_timestamp(start_timestamp: str, end_timestamp: str
         transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": start_timestamp}}, {
             "timestamp": {"$lte": end_timestamp}}]}))
 
+    # sort transactions by timestamp
+    transactions = sorted(
+        transactions, key=lambda transaction: transaction["timestamp"])
+
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(transactions, default=convert_object_id)))
 
 
@@ -770,6 +813,7 @@ async def create_transaction(transaction: Transaction):
                 "quantity": 2
                 }
             ],
+            "weight": 0,
             "kg_price": 30
         }
     '''
@@ -781,7 +825,7 @@ async def create_transaction(transaction: Transaction):
     # if only client_id is provided, update the transaction_dict with the rfid
 
     # if the kg_price is not provided, use the default KG_PRICE
-    if transaction_dict["kg_price"] is None:
+    if transaction_dict["kg_price"] is None or transaction_dict["kg_price"] == "":
         transaction_dict["kg_price"] = KG_PRICE
 
     client = None
@@ -825,9 +869,13 @@ async def create_transaction(transaction: Transaction):
     transaction_dict["total"] += CURRENT_WEIGHT * transaction_dict["kg_price"]
 
     # add the weight of the dish to the transaction
-    transaction_dict["weight"] = CURRENT_WEIGHT
-    transaction_dict["meal_price"] = CURRENT_WEIGHT * \
-        transaction_dict["kg_price"]
+    if (transaction_dict["weight"] is None or transaction_dict["weight"] == ""):
+        transaction_dict["weight"] = CURRENT_WEIGHT
+        transaction_dict["meal_price"] = CURRENT_WEIGHT * \
+            transaction_dict["kg_price"]
+    else:
+        transaction_dict["meal_price"] = transaction_dict["weight"] * \
+            transaction_dict["kg_price"]
 
     # check if client has enough balance to make the transaction
     # if client["balance"] < transaction_dict["total"]:

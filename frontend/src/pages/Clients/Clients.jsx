@@ -18,6 +18,8 @@ const Clients = () => {
     dispatch(getItems(true));
   }, []);
 
+  // TODO: Pay an amount of debt to client
+
   return (
     <div className="flex flex-col">
       <Toolbar />
@@ -53,13 +55,15 @@ const Clients = () => {
               sign={"+"}
             />
             <Card
-              title={clients.filter((row) => row.balance > 0).reduce((acc, row) => acc + row.balance, 0)}
+              title={`$R ${Number(
+                clients.filter((row) => row.balance > 0).reduce((acc, row) => acc + row.balance, 0)
+              ).toFixed(2)}`}
               subtitle={"Total sem dividas"}
               titleCompare={undefined}
               sign={"+"}
             />
             <Card
-              title={clients.reduce((acc, row) => acc + Math.abs(Number(row.balance)), 0)}
+              title={`$R ${Number(clients.reduce((acc, row) => acc + Math.abs(Number(row.balance)), 0)).toFixed(2)}`}
               subtitle={"Total somando pagamentos pendentes"}
               titleCompare={undefined}
               sign={"+"}

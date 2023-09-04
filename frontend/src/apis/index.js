@@ -1,11 +1,16 @@
 import axios from "axios";
+import moment from "moment";
 export const testing = false;
 
 export const CLIENT_API = axios.create({
   baseURL: testing ? "http://localhost:8003/api" : "http://localhost:8003/api",
 });
 
-export const getTransactions = (transaction_type = "sell") => CLIENT_API.get(`/transactions/${transaction_type}`);
+export const getTransactions = (
+  transaction_type = "sell",
+  start_timestamp = moment().subtract(2, "days").format("YYYY-MM-DD"),
+  end_timestamp = moment().format("YYYY-MM-DD")
+) => CLIENT_API.get(`/transactions/${transaction_type}/${start_timestamp}/${end_timestamp}`);
 export const getTransactionById = (id) => CLIENT_API.get(`/transaction/${id}`);
 export const createTransaction = (newTransaction) => CLIENT_API.post("/transactions", newTransaction);
 export const updateTransaction = (id, updatedTransaction) =>
