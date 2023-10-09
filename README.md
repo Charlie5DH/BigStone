@@ -75,3 +75,5 @@ Desconto professores - -10% desconto
 Remover compra
 Selecionar periodo para exportar para clientes
 mandar por email
+
+python send_plus_sense.py --host Dell-Carlos --port 8003 --api /api/current_dish_weight/add --interval 1
