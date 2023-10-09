@@ -20,6 +20,8 @@ const Clients = () => {
 
   // TODO: Pay an amount of debt to client
 
+  console.log(clients);
+
   return (
     <div className="flex flex-col">
       <Toolbar />
@@ -41,14 +43,14 @@ const Clients = () => {
         >
           <div className="flex flex-wrap lg:flex-nowrap items-stretch w-full lg:w-[90%] gap-2">
             <Card
-              title={clients.filter((row) => row.balance < 0).length}
+              title={clients.filter((row) => Number(row.balance) < 0).length}
               subtitle={"Clientes com dividas"}
               titleCompare={undefined}
               sign={"+"}
             />
             <Card
               title={`$R ${Number(
-                clients.filter((row) => row.balance < 0).reduce((acc, row) => acc + row.balance, 0)
+                clients.filter((row) => Number(row.balance) < 0).reduce((acc, row) => acc + Number(row.balance), 0)
               ).toFixed(2)}`}
               subtitle={"Total em pagamentos pendentes"}
               titleCompare={undefined}
@@ -56,7 +58,7 @@ const Clients = () => {
             />
             <Card
               title={`$R ${Number(
-                clients.filter((row) => row.balance > 0).reduce((acc, row) => acc + row.balance, 0)
+                clients.filter((row) => Number(row.balance) > 0).reduce((acc, row) => acc + Number(row.balance), 0)
               ).toFixed(2)}`}
               subtitle={"Total sem dividas"}
               titleCompare={undefined}

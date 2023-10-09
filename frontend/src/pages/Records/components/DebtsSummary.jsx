@@ -3,16 +3,16 @@ import React from "react";
 import { MdOutlineKeyboardDoubleArrowDown } from "react-icons/md";
 import { TiArrowSortedDown, TiArrowSortedUp, TiArrowUnsorted } from "react-icons/ti";
 
-const StockSummary = ({ transactionsSummary, items, activateDropdown = true, width = "lg:w-4/5 w-full" }) => {
+const DebtsSummary = ({ transactionsSummary, activateDropdown = true, width = "lg:w-4/5 w-full" }) => {
   const [sort, setSort] = React.useState(0);
   const [sortedTransactionsSummary, setSortedTransactionsSummary] = React.useState(
-    transactionsSummary.daily_stock_summary
+    transactionsSummary.daily_clear_debt_summary
   );
   const [activeDropdown, setActiveDropdown] = React.useState({});
 
   React.useEffect(() => {
-    setSortedTransactionsSummary(transactionsSummary.daily_stock_summary);
-  }, [transactionsSummary.daily_stock_summary]);
+    setSortedTransactionsSummary(transactionsSummary.daily_clear_debt_summary);
+  }, [transactionsSummary.daily_clear_debt_summary]);
 
   const handleDropDown = (e, submenuIndex) => {
     e.preventDefault();
@@ -26,7 +26,7 @@ const StockSummary = ({ transactionsSummary, items, activateDropdown = true, wid
     e.preventDefault();
     setActiveDropdown((prevState) => {
       const newState = {};
-      for (let i = 0; i < transactionsSummary.daily_stock_summary.length; i++) {
+      for (let i = 0; i < transactionsSummary.daily_clear_debt_summary.length; i++) {
         newState[i] = !prevState[i];
       }
       return newState;
@@ -52,18 +52,24 @@ const StockSummary = ({ transactionsSummary, items, activateDropdown = true, wid
               )}
               <div className="flex flex-nowrap items-center gap-2">
                 <span className="text-[13px] font-normal text-slate-500">
-                  Lucro total do periodo: <strong>$R {Number(transactionsSummary.total_made).toFixed(2)}</strong>
+                  total pago do periodo:{" "}
+                  <strong>
+                    $R{" "}
+                    {Number(
+                      transactionsSummary.daily_clear_debt_summary.reduce((acc, cur) => acc + cur.total_made, 0)
+                    ).toFixed(2)}
+                  </strong>
                 </span>
                 <div
                   onClick={() => {
                     if (sort === 0) {
                       setSortedTransactionsSummary(
-                        transactionsSummary.daily_stock_summary.sort((a, b) => new Date(b.date) - new Date(a.date))
+                        transactionsSummary.daily_clear_debt_summary.sort((a, b) => new Date(b.date) - new Date(a.date))
                       );
                       setSort(1);
                     } else if (sort === 1) {
                       setSortedTransactionsSummary(
-                        transactionsSummary.daily_stock_summary.sort((a, b) => new Date(a.date) - new Date(b.date))
+                        transactionsSummary.daily_clear_debt_summary.sort((a, b) => new Date(a.date) - new Date(b.date))
                       );
                       setSort(2);
                     } else {
@@ -88,20 +94,20 @@ const StockSummary = ({ transactionsSummary, items, activateDropdown = true, wid
           <ColumnOfList
             sort={sort}
             setSort={setSort}
-            elements={transactionsSummary.daily_stock_summary}
+            elements={transactionsSummary.daily_clear_debt_summary}
             sortKey="total_sells"
             defaultSortKey="date"
-            columnName="Quantidade reabastecida"
+            columnName="Creditos alterados"
             hide={false}
           />
 
           <ColumnOfList
             sort={sort}
             setSort={setSort}
-            elements={transactionsSummary.daily_stock_summary}
+            elements={transactionsSummary.daily_clear_debt_summary}
             sortKey="total_made"
             defaultSortKey="date"
-            columnName="Valor total dos produtos"
+            columnName="Total alterado em creditos"
             hide={false}
           />
         </div>
@@ -150,37 +156,23 @@ const StockSummary = ({ transactionsSummary, items, activateDropdown = true, wid
             {activeDropdown[index] && activateDropdown && (
               <div className="flex flex-col gap-y-1 px-3 py-2 duration-200 ml-6 border-t">
                 <div className="flex flex-col w-full gap-2 border rounded-md p-3 overflow-y-scroll max-h-[400px]">
-                  <span className="text-slate-700 font-secondary font-normal text-20">Relatorio de Estoque</span>
+                  <span className="text-slate-700 font-secondary font-normal text-20">Relatorio de Clientes</span>
                   <div id="divider" className="border-b my-2"></div>
 
-                  {transaction?.more_selled_items?.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between">
+                  {transaction?.clients_with_transactions?.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between my-1">
                       <div className="flex items-center">
-                        <img
-                          src={`http://localhost:8003/api/get_image/${
-                            items.find((row) => row._id === item.item_id).image
-                          }`} //"https://placehold.co/600x400" ||
-                          alt="product"
-                          className="rounded-md shadow-sm w-20 h-20 object-cover"
-                        />
-                        <div className="flex flex-col gap-y-1 ml-4">
-                          <span className="text-14 font-medium text-slate-700">
-                            {items.find((row) => row._id === item.item_id).name}
-                          </span>
-                          <span className="text-12 font-normal text-slate-500">
-                            {items.find((row) => row._id === item.item_id).description}
-                          </span>
+                        <div className="flex flex-col items-start">
+                          <span className="text-14 font-medium text-slate-700">{item.name}</span>
+                          <span className="text-12 font-normal text-slate-500">{item.email}</span>
                         </div>
                       </div>
                       <div className="flex flex-col">
                         <span className="text-14 font-medium text-slate-700 text-right">
-                          Total: R$ {Number(item.total).toFixed(2)}
+                          Total: $R {Number(item.total).toFixed(2)}
                         </span>
                         <span className="text-12 font-normal text-slate-500 text-right">
-                          Total Reabastecidos: {item.quantity}
-                        </span>
-                        <span className="text-12 font-normal text-slate-500 text-right">
-                          Preço da unidade: $R {item.price}
+                          Compras: {item.transactions}
                         </span>
                       </div>
                     </div>
@@ -228,4 +220,4 @@ const ColumnOfList = ({ sort, setSort, elements, sortKey, defaultSortKey, column
   );
 };
 
-export default StockSummary;
+export default DebtsSummary;

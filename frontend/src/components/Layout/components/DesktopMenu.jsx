@@ -4,7 +4,7 @@ import { BsFillCartFill } from "react-icons/bs";
 import { useLocation } from "react-router-dom";
 import Tooltip from "@mui/material/Tooltip";
 import { Badge } from "@mui/material";
-import logotext4 from "../../../assets/logotext4.svg";
+// import logotext4 from "../../../assets/logotext4.svg";
 
 const DesktopMenu = () => {
   // get current location path with react-router-dom
@@ -15,7 +15,8 @@ const DesktopMenu = () => {
 
   return (
     <div className="flex items-center justify-between mx-5 gap-1 w-full font-secondary">
-      <img src={logotext4} className="w-32 h-12" alt="logo" />
+      {/* <img src={logotext4} className="w-32 h-12" alt="logo" /> */}
+      <span className="text-28 text-indigo-500 font-semibold font-display">Cantina</span>
 
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">

@@ -5,7 +5,7 @@ import { links } from "../../../constants/links";
 import { Link, useLocation } from "react-router-dom";
 import { Badge } from "@mui/material";
 import { BsFillCartFill } from "react-icons/bs";
-import logotext4 from "../../../assets/logotext4.svg";
+// import logotext4 from "../../../assets/logotext4.svg";
 
 const MobileDesktop = () => {
   const menu = useRef(null);
@@ -65,7 +65,8 @@ const MobileDesktop = () => {
         ref={menu}
         id="popup_menu_left"
       />
-      <img src={logotext4} className="w-32 h-12" alt="logo" />
+      {/* <img src={logotext4} className="w-32 h-12" alt="logo" /> */}
+      <span className="text-28 text-indigo-500 font-semibold font-display">Cantina</span>
 
       <div className="flex items-center gap-4">
         <div className="cursor-pointer text-gray-300 hover:text-slate-600 p-1 duration-150">

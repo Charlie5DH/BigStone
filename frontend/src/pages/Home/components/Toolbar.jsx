@@ -6,6 +6,7 @@ import { SelectButton } from "primereact/selectbutton";
 const Toolbar = ({
   transactions,
   setVisible,
+  setVisibleNewManualTransaction,
   setFilteredRecords,
   filterQuery,
   setFilterQuery,
@@ -38,9 +39,16 @@ const Toolbar = ({
         </div>
         <div className="flex items-center gap-2">
           <GenericButton
-            text="Atualizar Preço do Kg"
+            text="+ Venda"
             color={"white"}
             bgColor={"bg-emerald-500"}
+            onClick={() => setVisibleNewManualTransaction(true)}
+            icon={undefined}
+          />
+          <GenericButton
+            text="Atualizar Preço do Kg"
+            color={"slate-500"}
+            bgColor={"bg-white"}
             onClick={() => setVisible(true)}
             icon={undefined}
           />

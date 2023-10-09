@@ -36,7 +36,7 @@ export const getTransactionsSummaryByClient = (client_id, period) =>
 export const getClients = () => CLIENT_API.get("/clients");
 export const getClientById = (id) => CLIENT_API.get(`/client/${id}`);
 export const postClient = (newClient) => CLIENT_API.post("/create_clients", newClient);
-export const updateClient = (id, updatedClient) => CLIENT_API.patch(`/client/${id}`, updatedClient);
+export const updateClient = (id, updatedClient) => CLIENT_API.put(`/client/${id}`, updatedClient);
 export const clearDebtOfClients = (ids) => CLIENT_API.put(`/clients/clear_debt/${ids}`);
 export const deleteClient = (id) => CLIENT_API.delete(`/client/${id}`);
 export const deleteClients = (ids) => CLIENT_API.delete(`/clients/${ids}`);

@@ -5,7 +5,7 @@ import { MdAccountBalanceWallet, MdOutlineKeyboardDoubleArrowDown } from "react-
 import Checkbox from "../Inputs/Checkbox";
 import { TiArrowSortedDown, TiArrowSortedUp, TiArrowUnsorted } from "react-icons/ti";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
-import { clearDebtOfClients, deleteClients } from "../../actions/clients";
+import { clearDebtOfClients, deleteClients, updateClient } from "../../actions/clients";
 import { useDispatch, useSelector } from "react-redux";
 import { Dialog } from "primereact/dialog";
 import { Sidebar } from "primereact/sidebar";
@@ -15,6 +15,7 @@ import { getItems } from "../../actions/items";
 import { ProgressSpinner } from "primereact/progressspinner";
 import TotalSummary from "../../pages/Records/components/TotalSummary";
 import DailySummary from "../../pages/Records/components/DailySummary";
+import { Accordion, AccordionTab } from "primereact/accordion";
 
 const ClientsList = ({ clients, items }) => {
   const [sort, setSort] = React.useState(0);
@@ -24,7 +25,8 @@ const ClientsList = ({ clients, items }) => {
   const [confirmClearDebt, setConfirmClearDebt] = React.useState(false);
   const [activeDropdown, setActiveDropdown] = React.useState({});
   const [visibleUserTransactionsDialog, setVisibleUserTransactionsDialog] = React.useState(false);
-  const [selectedClientToViewTransactions, setSelectedClientToViewTransactions] = React.useState({}); //[
+  const [selectedClientToViewTransactions, setSelectedClientToViewTransactions] = React.useState({});
+  const [editClientDialog, setEditClientDialog] = React.useState(false);
   const dispatch = useDispatch();
 
   const options = ["Hoje", "Ontem", "Últimos 7 dias", "Últimos 30 dias", "3 Mêses", "Selecione um período"];
@@ -33,6 +35,7 @@ const ClientsList = ({ clients, items }) => {
   const { isLoadingSummaryOfTransactions, transactionsSummaryByClient } = useSelector((state) => state.transactions);
   const [viewOption, setViewOption] = React.useState(viewOptions[0]);
   const [option, setOption] = React.useState(options[2]);
+  const [formData, setFormData] = React.useState({});
 
   React.useEffect(() => {
     setSortedClients(clients);
@@ -73,6 +76,25 @@ const ClientsList = ({ clients, items }) => {
     dispatch(clearDebtOfClients(JSON.stringify(selected)));
     setConfirmClearDebt(false);
     setSelected([]);
+  };
+
+  const handleUpdateClient = () => {
+    // update client
+    setEditClientDialog(false);
+    dispatch(
+      updateClient(formData._id, {
+        name: formData.name,
+        email: formData.email,
+        cpf: formData.cpf,
+        phone: formData.phone,
+        address: formData.address,
+        group: formData.group,
+        cep: formData.cep,
+        rfid: formData.rfid,
+        balance: formData.balance,
+        timestamp: new Date().toISOString(),
+      })
+    );
   };
 
   return (
@@ -276,6 +298,10 @@ const ClientsList = ({ clients, items }) => {
            hover:text-slate-400 duration-200 border-l"
               >
                 <button
+                  onClick={() => {
+                    setFormData(client);
+                    setEditClientDialog(true);
+                  }}
                   className="flex items-center gap-2 text-slate-500 font-secondary font-normal text-12 px-2 py-0.5 
                 rounded-md hover:scale-105 duration-150 border bg-slate-200"
                 >
@@ -351,6 +377,173 @@ const ClientsList = ({ clients, items }) => {
           </span>
         </div>
       </Dialog>
+
+      <Dialog
+        header="Editar informações do cliente"
+        visible={editClientDialog}
+        style={{ width: "50vw" }}
+        onHide={() => setEditClientDialog(false)}
+        footer={
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setEditClientDialog(false)}
+              className="bg-white hover:bg-red-400 hover:text-white text-slate-500 text-14 font-normal 
+        py-1 px-3 rounded-md border duration-200 shadow-sm shadow-indigo-200 active:scale-95"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() => handleUpdateClient()}
+              className="bg-indigo-500 hover:bg-indigo-400 text-white text-14 font-normal 
+                  py-1 px-3 rounded-md duration-200 shadow-md shadow-indigo-200 active:scale-95"
+            >
+              Confirmar
+            </button>
+          </div>
+        }
+      >
+        <Accordion activeIndex={1} className="my-2">
+          <AccordionTab header="Informações do cliente">
+            <div className="flex flex-col gap-y-2 font-secondary">
+              <div className="flex flex-col w-full mx-1">
+                <span className="text-14 text-gray-500 font-normal">Nome do cliente</span>
+                <input
+                  className="relative w-full h-10 cursor-text text-left font-normal sm:text-14 dark:bg-secondary-dark-bg dark:text-white
+              focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
+              focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
+                  name="name_of_client"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder={`Entre o nome do cliente`}
+                  autoComplete="off"
+                ></input>
+              </div>
+
+              <div className="flex flex-col w-full mx-1">
+                <span className="text-14 text-gray-500 font-normal">email</span>
+                <input
+                  className="relative w-full h-10 cursor-text text-left font-normal sm:text-14 dark:bg-secondary-dark-bg dark:text-white
+              focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
+              focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder={`Entre um email válido`}
+                  autoComplete="off"
+                ></input>
+              </div>
+
+              <div className="flex flex-col w-full mx-1">
+                <span className="text-14 text-gray-500 font-normal">CPF</span>
+                <input
+                  className="relative w-full h-10 cursor-text text-left font-normal sm:text-14 dark:bg-secondary-dark-bg dark:text-white
+              focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
+              focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
+                  name="cpf"
+                  type="text"
+                  value={formData.cpf}
+                  onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                  placeholder={`000.000.000-00`}
+                  autoComplete="off"
+                ></input>
+              </div>
+
+              <div className="flex flex-col w-full mx-1">
+                <span className="text-14 text-gray-500 font-normal">Telefone</span>
+                <input
+                  className="relative w-full h-10 cursor-text text-left font-normal sm:text-14 dark:bg-secondary-dark-bg dark:text-white
+              focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
+              focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
+                  name="phone"
+                  type="text"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder={`(00) 00000-0000`}
+                  autoComplete="off"
+                ></input>
+              </div>
+
+              <div className="flex flex-col w-full mx-1">
+                <span className="text-14 text-gray-500 font-normal">Endereço</span>
+                <input
+                  className="relative w-full h-10 cursor-text text-left font-normal sm:text-14 dark:bg-secondary-dark-bg dark:text-white
+              focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
+              focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
+                  name="address"
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  placeholder={`Rua, numero, bairro`}
+                  autoComplete="off"
+                ></input>
+              </div>
+
+              <div className="flex flex-col w-full mx-1">
+                <span className="text-14 text-gray-500 font-normal">Grupo</span>
+                <input
+                  className="relative w-full h-10 cursor-text text-left font-normal sm:text-14 dark:bg-secondary-dark-bg dark:text-white
+              focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
+              focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
+                  name="group"
+                  type="text"
+                  value={formData.group}
+                  onChange={(e) => setFormData({ ...formData, group: e.target.value })}
+                  placeholder={`regular`}
+                  autoComplete="off"
+                ></input>
+              </div>
+
+              <div className="flex flex-col w-full mx-1">
+                <span className="text-14 text-gray-500 font-normal">CEP</span>
+                <input
+                  className="relative w-full h-10 cursor-text text-left font-normal sm:text-14 dark:bg-secondary-dark-bg dark:text-white
+              focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
+              focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
+                  name="cep"
+                  type="text"
+                  value={formData.cep}
+                  onChange={(e) => setFormData({ ...formData, cep: e.target.value })}
+                  placeholder={`00000-000`}
+                  autoComplete="off"
+                ></input>
+              </div>
+
+              <div className="flex flex-col w-full mx-1">
+                <span className="text-14 text-gray-500 font-normal">RFID</span>
+                <textarea
+                  className="relative w-full h-20 cursor-text text-left font-normal sm:text-14 dark:bg-secondary-dark-bg dark:text-white
+              focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
+              focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
+                  name="rfid"
+                  value={formData.rfid}
+                  onChange={(e) => setFormData({ ...formData, rfid: e.target.value })}
+                  placeholder={`rfid do cartão do cliente`}
+                  autoComplete="off"
+                ></textarea>
+              </div>
+            </div>
+          </AccordionTab>
+          <AccordionTab header="Credito do cliente">
+            <div className="flex flex-col w-full mx-1">
+              <span className="text-14 text-gray-500 font-normal">Credito do cliente</span>
+              <input
+                className="relative w-full h-10 cursor-text text-left font-normal sm:text-14 dark:bg-secondary-dark-bg dark:text-white
+              focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
+              focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
+                name="balance"
+                type="number"
+                value={formData.balance}
+                onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
+                placeholder={`0`}
+                autoComplete="off"
+              ></input>
+            </div>
+          </AccordionTab>
+        </Accordion>
+      </Dialog>
+
       <Sidebar
         visible={visibleUserTransactionsDialog}
         position="right"

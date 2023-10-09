@@ -7,10 +7,11 @@ import Toolbar from "./components/Toolbar";
 import TotalSummary from "./components/TotalSummary";
 import DailySummary from "./components/DailySummary";
 import StockSummary from "./components/StockSummary";
+import DebtsSummary from "./components/DebtsSummary";
 
 const Records = () => {
   const options = ["Hoje", "Ontem", "Últimos 7 dias", "Últimos 30 dias", "3 Mêses", "Selecione um período"];
-  const viewOptions = ["Total", "Diario", "Inventário"];
+  const viewOptions = ["Total", "Diario", "Inventário", "Pagamento de dividas"];
 
   const { items, isLoadingItems } = useSelector((state) => state.items);
   const { transactions, isLoadingTransactions, isLoadingSummaryOfTransactions, transactionsSummary } = useSelector(
@@ -63,8 +64,10 @@ const Records = () => {
               <TotalSummary transactionsSummary={transactionsSummary} items={items} />
             ) : viewOption === "Diario" ? (
               <DailySummary transactionsSummary={transactionsSummary} items={items} />
-            ) : (
+            ) : viewOption === "Inventário" ? (
               <StockSummary transactionsSummary={transactionsSummary} items={items} />
+            ) : (
+              <DebtsSummary transactionsSummary={transactionsSummary} items={items} />
             )}
           </div>
         </div>

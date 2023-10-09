@@ -13,9 +13,13 @@ const generateUniqueHex16 = () => {
   return Math.floor(Math.random() * 0xffffffffffffffff).toString(16);
 };
 
-const Toolbar = () => {
-  const [selectedCategory, setSelectedCategory] = React.useState(null);
-  const [inputTextFilter, setInputTextFilter] = React.useState("");
+const Toolbar = ({
+  selectedCategory,
+  setSelectedCategory,
+  inputTextFilter,
+  setInputTextFilter,
+  handleFilterItemsByName,
+}) => {
   const options = ["Cards", "List"];
   const [file, setFile] = React.useState();
   const dispatch = useDispatch();
@@ -116,7 +120,7 @@ const Toolbar = () => {
           <Input
             value={inputTextFilter}
             icon={<AiOutlineSearch className="text-slate-500 text-20 mr-2" />}
-            onChange={(e) => setInputTextFilter(e.target.value)}
+            onChange={(e) => handleFilterItemsByName(e)}
             placeholder="Procurar por nome, código ou categoria"
           />
 

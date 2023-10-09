@@ -253,7 +253,7 @@ const RecordsList = ({ records, produtos }) => {
              hover:text-slate-400 duration-200 border-l"
               >
                 <span className="text-slate-500 font-display font-light text-14">
-                  $R {Number(record.meal_price).toFixed(1)}
+                  $R {Number(record.meal_price).toFixed(2)}
                 </span>
               </div>
 
@@ -292,7 +292,7 @@ const RecordsList = ({ records, produtos }) => {
              hover:text-slate-400 duration-200 border-l col-span-1"
               >
                 <span className="text-slate-500 font-display font-light text-14">
-                  $R {Number(record.total).toFixed(1)}
+                  $R {Number(record.total).toFixed(2)}
                 </span>
               </div>
 

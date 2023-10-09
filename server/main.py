@@ -2,8 +2,7 @@ import os
 import pymongo
 import json
 from fastapi import FastAPI, File, UploadFile
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timezone, timedelta
 from fastapi import FastAPI, HTTPException, status, APIRouter, WebSocket
 from fastapi.responses import JSONResponse, Response, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -77,8 +76,8 @@ async def websocket_endpoint(websocket: WebSocket):
         websocket_clients.remove(websocket)
 
 
-@app.post("/api/current_dish_weight/{weight}", tags=["weight"])
-async def current_dish_weight(weight: float):
+@app.post("/api/current_dish_weight/{action}/{weight}/{timestamp}", tags=["weight"])
+async def current_dish_weight(action: str, weight: float, timestamp: str):
     ''' API for setting the current weight of the dish
 
     Attributes:
@@ -88,17 +87,36 @@ async def current_dish_weight(weight: float):
 
     Save the current weight in the database for future reference
     '''
+    # TODO: SEND CLIENT INFORMATION (RFID or ID) TO THE SERVER
 
     global CURRENT_WEIGHT
-    CURRENT_WEIGHT = weight
+
+    if timestamp == "None" or timestamp == "":
+        timestamp = datetime.now().isoformat()
+
+    if action == "add":
+        CURRENT_WEIGHT = weight
+
+        for client in websocket_clients:
+            message = {"type": "json",
+                       "message": "new_weight",
+                       "weight": weight,
+                       "timestamp": timestamp}
+            await client.send_json(message)
+
+        # save the current weight in the database for future reference
+        weights_collection.insert_one(
+            {"weight": weight, "timestamp": timestamp})
+
+        return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(weight, default=convert_object_id)))
+
+    # cancel the current weight
+    CURRENT_WEIGHT = 0
 
     for client in websocket_clients:
-        message = {"type": "json", "message": "new_weight", "weight": weight}
+        message = {"type": "json", "message": "cancel",
+                   "weight": 0, "timestamp": timestamp}
         await client.send_json(message)
-
-    # save the current weight in the database for future reference
-    weights_collection.insert_one(
-        {"weight": weight, "timestamp": datetime.now().isoformat()})
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(weight, default=convert_object_id)))
 
@@ -196,6 +214,31 @@ async def update_client(client_id: str, client: dict):
         {"name": "John Doe"}
     '''
 
+    # if balance is being updated, create a transaction of type "clear_debt" with the difference between the old and the new balance
+    if "balance" in client:
+        original_client = clients_collection.find_one(
+            {"_id": ObjectId(client_id)})
+
+        # create a transaction of type "clear_debt" with the difference between the old and the new balance
+        transaction = {
+            "client_name": original_client["name"],
+            "client_email": original_client["email"],
+            "rfid": original_client["rfid"],
+            "client_id": original_client["_id"],
+            "transaction_type": "clear_debt",
+            "items": [],
+            "total": float(client["balance"]) - float(original_client["balance"]),
+            "timestamp": client["timestamp"],
+            "kg_price": 0,
+            "meal_price": 0,
+            "weight": 0
+        }
+        transactions_collection.insert_one(transaction)
+
+    # remove the timestamp from the client dict
+    if "timestamp" in client:
+        del client["timestamp"]
+
     clients_collection.update_one(
         {"_id": ObjectId(client_id)}, {"$set": client})
     updated_client = clients_collection.find_one({"_id": ObjectId(client_id)})
@@ -247,6 +290,8 @@ async def clear_debt(client_ids: str):
         {"_id": {"$in": [ObjectId(id) for id in client_ids]}}, {"$set": {"balance": 0}})
     updated_clients = list(clients_collection.find(
         {"_id": {"$in": [ObjectId(id) for id in client_ids]}}))
+
+    # the timestamp of the transaction must be in the format 2023-09-04T22:17:57.835Z
 
     # create a transaction for each client to clear their debt
     for client in clients:
@@ -384,11 +429,15 @@ async def get_items(sold_this_month: bool = False, period: int = 30):
                         sold_this_month += item_in_transaction["quantity"]
 
                         # check if the transaction was made in the last week
-                        if datetime.now() - timedelta(days=7) <= datetime.fromisoformat(transaction["timestamp"]) <= datetime.now():
+                        # Convert transaction timestamp to an offset-aware datetime object
+                        transaction_timestamp = datetime.fromisoformat(
+                            transaction["timestamp"]).replace(tzinfo=timezone.utc)
+
+                        if datetime.now(timezone.utc) - timedelta(days=7) <= transaction_timestamp <= datetime.now(timezone.utc):
                             sold_this_week += item_in_transaction["quantity"]
 
                             # check if the transaction was made today
-                            if datetime.now() - timedelta(days=1) <= datetime.fromisoformat(transaction["timestamp"]) <= datetime.now():
+                            if datetime.now(timezone.utc) - timedelta(days=1) <= transaction_timestamp <= datetime.now(timezone.utc):
                                 sold_today += item_in_transaction["quantity"]
 
             item["sold_this_month"] = sold_this_month
@@ -1168,6 +1217,63 @@ async def get_transactions_summary(period: str, start_timestamp: str = None, end
         daily_stock_summary.sort(key=lambda day: day["date"], reverse=True)
 
     # -------------------------------------------------------------------------------------------------
+    # create a daily summary for the transactions of type "clear_debt"
+    # get the first day of the period
+    start_date = datetime.fromisoformat(start_timestamp).replace(
+        hour=0, minute=0, second=0, microsecond=0)
+    # get the last day of the period
+    end_date = datetime.fromisoformat(end_timestamp).replace(
+        hour=23, minute=59, second=59, microsecond=999999)
+    # get the number of days in the period
+    days = (end_date - start_date).days + 1
+    # create a dictionary with the summary of the transactions of each day
+    daily_clear_debt_summary = []
+
+    for day in range(days):
+        # get the date of the day
+        date = start_date + timedelta(days=day)
+        # get the transactions of the day
+        transactions = list(transactions_collection.find({"$and": [{"timestamp": {"$gte": date.isoformat()}}, {
+            "timestamp": {"$lte": (date + timedelta(days=1)).isoformat()}}, {"transaction_type": "clear_debt"}]}))
+
+        # summary
+        total_made_daily_clear_debt = 0
+        clients_with_transactions = []
+        # clients with transactions contains the clients that made transactions in that day
+        # in the format {"client_id": "123", "transactions": 1, "total": 10}
+
+        for transaction in transactions:
+            # get the clients that made transactions in that day and build the clients_with_transactions list
+            client_in_period = next(
+                (client_period for client_period in clients_with_transactions if client_period["client_id"] == transaction["client_id"]), None)
+            if client_in_period is None:
+                clients_with_transactions.append(
+                    {"client_id": transaction["client_id"],
+                     "transactions": 1,
+                     "total": transaction["total"],
+                     "name": transaction["client_name"],
+                     "email": transaction["client_email"]})
+            else:
+                client_in_period["transactions"] += 1
+                client_in_period["total"] += transaction["total"]
+
+            total_made_daily_clear_debt += transaction["total"]
+
+        # sort the clients by transactions
+        clients_with_transactions.sort(
+            key=lambda client: client["transactions"], reverse=True)
+
+        # add the summary of the day to the daily_summary dictionary
+        daily_clear_debt_summary.append({
+            "date": date.isoformat(),
+            "total_sells": len(transactions),
+            "total_made": total_made_daily_clear_debt,
+            "clients_with_transactions": clients_with_transactions
+        })
+
+    daily_clear_debt_summary.sort(key=lambda day: day["date"], reverse=True)
+
+    # -------------------------------------------------------------------------------------------------
 
     summary = {
         "total_sells": total_sells,
@@ -1179,7 +1285,8 @@ async def get_transactions_summary(period: str, start_timestamp: str = None, end
         "clients_with_more_transactions": clients_with_more_transactions,
         "clients_that_spent_more_money": clients_that_spent_more_money,
         "daily_summary": daily_summary,
-        "daily_stock_summary": daily_stock_summary
+        "daily_stock_summary": daily_stock_summary,
+        "daily_clear_debt_summary": daily_clear_debt_summary
     }
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(summary, default=convert_object_id)))

@@ -68,3 +68,10 @@ README.md # Readme file
 
 - NextJS
 - TailwindCSS
+
+## Notas
+
+Desconto professores - -10% desconto
+Remover compra
+Selecionar periodo para exportar para clientes
+mandar por email

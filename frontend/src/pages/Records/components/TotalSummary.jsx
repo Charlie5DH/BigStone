@@ -15,7 +15,7 @@ const TotalSummary = ({ transactionsSummary, items, activateDropdown = true, wid
             $R {Number(transactionsSummary.total_made).toFixed(2)}
           </span>
           <div id="divider" className="border-b my-2"></div>
-          <span className="text-slate-500 font-secondary font-normal text-14">Lucro total</span>
+          <span className="text-slate-500 font-secondary font-normal text-14">Total de entradas</span>
         </div>
         <div className="flex flex-col border rounded-md p-3 w-full">
           <span className="text-slate-700 font-secondary font-normal text-20">
@@ -61,7 +61,9 @@ const TotalSummary = ({ transactionsSummary, items, activateDropdown = true, wid
                 </div>
               </div>
               <div className="flex flex-col">
-                <span className="text-14 font-medium text-slate-700 text-right">Total: R$ {item.total}</span>
+                <span className="text-14 font-medium text-slate-700 text-right">
+                  Total: R$ {Number(item.total).toFixed(2)}
+                </span>
                 <span className="text-12 font-normal text-slate-500 text-right">Total vendidos: {item.quantity}</span>
                 <span className="text-12 font-normal text-slate-500 text-right">Preço da unidade: $R {item.price}</span>
               </div>
@@ -83,7 +85,9 @@ const TotalSummary = ({ transactionsSummary, items, activateDropdown = true, wid
                 </div>
               </div>
               <div className="flex flex-col">
-                <span className="text-14 font-medium text-slate-700 text-right">Total: $R {item.total}</span>
+                <span className="text-14 font-medium text-slate-700 text-right">
+                  Total: $R {Number(item.total).toFixed(2)}
+                </span>
                 <span className="text-12 font-normal text-slate-500 text-right">Compras: {item.transactions}</span>
               </div>
             </div>
