@@ -20,8 +20,6 @@ const Clients = () => {
 
   // TODO: Pay an amount of debt to client
 
-  console.log(clients);
-
   return (
     <div className="flex flex-col">
       <Toolbar />

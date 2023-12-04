@@ -39,7 +39,7 @@ const Toolbar = ({
         </div>
         <div className="flex items-center gap-2">
           <GenericButton
-            text="+ Venda"
+            text="+ Venda de itens"
             color={"white"}
             bgColor={"bg-emerald-500"}
             onClick={() => setVisibleNewManualTransaction(true)}

@@ -9,7 +9,10 @@ import {
   CLIENTS_FAILED,
   END_CLIENTS_LOADING,
   DELETE_CLIENTS,
+  GET_CLIENT_BY_RFID,
   CLEAR_DEBT_CLIENTS,
+  LOADING_CLIENTS_BY_RFID,
+  END_CLIENTS_BY_RFID_LOADING,
 } from "../constants/clients";
 
 export const getClients = () => async (dispatch) => {
@@ -21,6 +24,18 @@ export const getClients = () => async (dispatch) => {
     dispatch({ type: CLIENTS_FAILED, payload: error });
   } finally {
     dispatch({ type: END_CLIENTS_LOADING });
+  }
+};
+
+export const getClientUsingRFID = (rfid) => async (dispatch) => {
+  dispatch({ type: LOADING_CLIENTS_BY_RFID });
+  try {
+    const { data } = await api.getClientByRFID(rfid);
+    dispatch({ type: GET_CLIENT_BY_RFID, payload: data });
+  } catch (error) {
+    dispatch({ type: CLIENTS_FAILED, payload: error });
+  } finally {
+    dispatch({ type: END_CLIENTS_BY_RFID_LOADING });
   }
 };
 

@@ -114,7 +114,7 @@ const ClientsList = ({ clients, items }) => {
               </div>
               <div className="flex flex-wrap items-start gap-2">
                 <Checkbox
-                  label={""}
+                  label={`Selecionados: ${selected.length}`}
                   checked={selected.length === clients.length && selected.length !== 0 ? true : false}
                   onChange={() =>
                     setSelected(
@@ -125,13 +125,14 @@ const ClientsList = ({ clients, items }) => {
                   checkBoxSize="h-[18px] w-[18px]"
                   rounded="rounded-[4px]"
                   disabled={false}
+                  size="small"
                   font="font-normal"
                   icon={undefined}
                 />
 
                 {selected.length !== 0 ? (
                   <div className="lg:flex grid grid-cols-1 items-center gap-3">
-                    <span className="text-[13px] font-normal text-slate-500">Selecionados: {selected.length}</span>
+                    <span className="text-[13px] font-normal text-slate-500"></span>
                     <button
                       onClick={() => setConfirmDelete(true)}
                       className="flex items-center gap-1 text-white font-secondary font-normal text-12 
@@ -167,13 +168,21 @@ const ClientsList = ({ clients, items }) => {
             <span className="text-[13px] font-normal">Telefone</span>
           </div>
 
-          <div className="xl:flex hidden items-center justify-center gap-1 col-span-2 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l">
+          {/* <div className="xl:flex hidden items-center justify-center gap-1 col-span-2 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l">
             <span className="text-[13px] font-normal">Endereço</span>
+          </div> */}
+
+          <div className="xl:flex hidden items-center justify-center gap-1 col-span-2 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l">
+            <span className="text-[13px] font-normal">Barcode</span>
           </div>
 
           <div className="xl:flex hidden items-center justify-center gap-1 col-span-1 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l">
-            <span className="text-[13px] font-normal ml-1">CEP</span>
+            <span className="text-[13px] font-normal">Grupo</span>
           </div>
+
+          {/* <div className="xl:flex hidden items-center justify-center gap-1 col-span-1 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l">
+            <span className="text-[13px] font-normal ml-1">CEP</span>
+          </div> */}
 
           <div
             onClick={() => {
@@ -256,47 +265,42 @@ const ClientsList = ({ clients, items }) => {
                 </div>
               </div>
 
-              <div
-                className="lg:flex hidden items-center justify-center gap-1 text-slate-500
-             hover:text-slate-400 duration-200 border-l"
-              >
+              <div className="lg:flex hidden items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l">
                 <span className="text-slate-500 font-display font-light text-14">{client.cpf}</span>
               </div>
 
-              <div
-                className="lg:flex hidden items-center justify-center gap-1 text-slate-500
-             hover:text-slate-400 duration-200 border-l col-span-1"
-              >
+              <div className="lg:flex hidden items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l col-span-1">
                 <span className="text-slate-500 font-display font-light text-14">{client.phone}</span>
               </div>
-
-              <div
-                className="lg:flex hidden items-center justify-center gap-1 text-slate-500
-             hover:text-slate-400 duration-200 border-l col-span-2"
-              >
+              {/* 
+              <div className="lg:flex hidden items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l col-span-2">
                 <span className="text-slate-500 font-display font-light text-14">{client.address}</span>
-              </div>
+              </div> */}
 
-              <div
+              {/* <div
                 className="lg:flex hidden items-center justify-center gap-1 text-slate-500
              hover:text-slate-400 duration-200 border-l col-span-1"
               >
                 <span className="text-slate-500 font-display font-light text-14">{client.cep}</span>
+              </div> */}
+
+              <div className="lg:flex hidden items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l col-span-2">
+                <span className="text-slate-500 font-display font-light text-14">{client.rfid}</span>
+              </div>
+
+              <div className="lg:flex hidden items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l col-span-1">
+                <span className="text-slate-500 font-display font-light text-14">{client.group}</span>
               </div>
 
               <div
-                className={`lg:flex hidden items-center justify-center gap-1
-             hover:text-slate-400 duration-200 border-l col-span-1 ${
-               client.balance < 0 ? "text-red-400 font-normal" : "text-emerald-500 font-medium"
-             }`}
+                className={`lg:flex hidden items-center justify-center gap-1 hover:text-slate-400 duration-200 border-l col-span-1 ${
+                  client.balance < 0 ? "text-red-400 font-normal" : "text-emerald-500 font-medium"
+                }`}
               >
                 <span className="font-display text-14">$R {Number(client.balance).toFixed(2)}</span>
               </div>
 
-              <div
-                className="xl:flex hidden items-center justify-center gap-1 col-span-1 text-slate-500
-           hover:text-slate-400 duration-200 border-l"
-              >
+              <div className="xl:flex hidden items-center justify-center gap-1 col-span-1 text-slate-500 hover:text-slate-400 duration-200 border-l">
                 <button
                   onClick={() => {
                     setFormData(client);
@@ -554,12 +558,36 @@ const ClientsList = ({ clients, items }) => {
           <span className="text-20 font-medium text-slate-700">Ultimas compras</span>
           <div id="divider" className="w-full h-[1px] bg-slate-200"></div>
 
-          <div className="flex items-center justify-between">
-            <span className="text-14 font-normal text-slate-500">Cliente: {selectedClientToViewTransactions.name}</span>
-            <span className="text-14 font-normal text-slate-500">Email: {selectedClientToViewTransactions.email}</span>
+          <div className="flex flex-col border rounded-md shadow-sm p-3 gap-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-14 font-normal text-slate-500">
+                Cliente: {selectedClientToViewTransactions.name}
+              </span>
+              <span className="text-14 font-normal text-slate-500">
+                Email: {selectedClientToViewTransactions.email}
+              </span>
+            </div>
+
+            <div id="divider" className="w-full h-[1px] bg-slate-200"></div>
             <span className="text-14 font-normal text-slate-500">
               Balance: {selectedClientToViewTransactions.balance}
             </span>
+            <div id="divider" className="w-full h-[1px] bg-slate-200"></div>
+            <span className="text-14 font-normal text-slate-500">Grupo: {selectedClientToViewTransactions.group}</span>
+            <div id="divider" className="w-full h-[1px] bg-slate-200"></div>
+            <span className="text-14 font-normal text-slate-500">CPF: {selectedClientToViewTransactions.cpf}</span>
+            <div id="divider" className="w-full h-[1px] bg-slate-200"></div>
+            <span className="text-14 font-normal text-slate-500">
+              Telefone: {selectedClientToViewTransactions.phone}
+            </span>
+            <div id="divider" className="w-full h-[1px] bg-slate-200"></div>
+            <span className="text-14 font-normal text-slate-500">
+              Endereço: {selectedClientToViewTransactions.address}
+            </span>
+            <div id="divider" className="w-full h-[1px] bg-slate-200"></div>
+            <span className="text-14 font-normal text-slate-500">CEP: {selectedClientToViewTransactions.cep}</span>
+            <div id="divider" className="w-full h-[1px] bg-slate-200"></div>
+            <span className="text-14 font-normal text-slate-500">RFID: {selectedClientToViewTransactions.rfid}</span>
           </div>
 
           {isLoadingSummaryOfTransactions ? (

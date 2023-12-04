@@ -5,6 +5,8 @@ import time
 from datetime import datetime
 import argparse
 from sense_hat import SenseHat
+import threading
+from evdev import InputDevice, list_devices, categorize, ecodes
 
 # assumming this is running on a raspberry pi with a sense hat
 # draw a smiley face on the sense hat
@@ -82,16 +84,22 @@ url = 'http://' + args.host + ':' + args.port + args.api
 # define headers
 headers = {'Content-Type': 'application/json'}
 
+devices = [InputDevice(path) for path in list_devices()]
+dev = None
+
 # define time interval
 if args.interval:
     interval = int(args.interval)
 else:
     interval = 0
 
+current_barcode = '0'
 # generate random weight data
 
 
 def generate_weight():
+    # Here is where you would get the weight from the scale and return it
+    # for now, we will generate random weight data
     weight = random.uniform(0, 2)
     # round to 2 decimal places
     weight = round(weight, 2)
@@ -117,7 +125,51 @@ def send_data():
     response = requests.post(url, headers=headers)
     # print response
     print(response.text)
+    
+def send_rfid(barcode):
+    
+    payload = {'message': "rfid", 'value': barcode}
+    # convert payload to json
+    payload = json.dumps(payload)
+    # send data
+    url = 'http://' + args.host + ':' + \
+        args.port + '/api/registered_barcode/'+ str(barcode)
+    print("url: \n", url)
+    response = requests.post(url, headers=headers)
+    # print response
+    print(response.text)
+    
+def read_barcode(callback):
+    '''
+    Function that reads a single input from the barcode scanner
+    and calls the callback function with the string of the barcode
+    Input: callback function that takes a string argument
+    Output: None
+    '''
+    for device in devices:
+        
+        if device.name == "USB Adapter USB Device" and device.phys.startswith('usb-3f980000'):
+            dev = device
+            break
 
+    if dev is None:
+        print("Device not found")
+        return
+    
+    barcode = ''
+    print("waiting barcode")
+
+    for event in dev.read_loop():
+        if event.type == ecodes.EV_KEY:
+            data = categorize(event)
+            if data.keystate == 1:  # key down events only
+                key = data.keycode[4:] if data.keycode.startswith('KEY_') else ''
+                if key.isdigit():
+                    barcode += key
+                elif key == 'ENTER':
+                    print('barcode scanned: ', barcode)
+                    callback(barcode)
+                    barcode = ''
 
 if __name__ == '__main__':
 
@@ -125,6 +177,10 @@ if __name__ == '__main__':
     # send data every interval seconds
     # callibrate the accelerometer to detect vertical movement
     # if vertical movement is detected, send data
+    
+    # read barcode
+    t = threading.Thread(target=read_barcode, args=(send_rfid,))
+    t.start()
 
     print("running...")
 
@@ -140,6 +196,4 @@ if __name__ == '__main__':
             send_data()
             time.sleep(1)
             sense.set_pixels(smiley_face)
-        # if no movement, sleep for interval seconds
-        else:
-            time.sleep(interval)
+        

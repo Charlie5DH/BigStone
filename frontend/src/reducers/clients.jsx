@@ -9,14 +9,26 @@ import {
   END_CLIENTS_LOADING,
   DELETE_CLIENTS,
   CLEAR_DEBT_CLIENTS,
+  GET_CLIENT_BY_RFID,
+  LOADING_CLIENTS_BY_RFID,
+  END_CLIENTS_BY_RFID_LOADING,
 } from "../constants/clients";
 
-const reducer = (state = { clients: [], client: {}, isLoadingClients: true, clientsFailed: false }, action) => {
+const reducer = (
+  state = { clients: [], client: {}, isLoadingClients: true, isLoadingClientByRfid: false, clientsFailed: false },
+  action
+) => {
   switch (action.type) {
     case GET_CLIENTS:
       return { ...state, clients: action.payload };
     case GET_CLIENT:
       return { ...state, client: action.payload };
+    case GET_CLIENT_BY_RFID:
+      return { ...state, client: action.payload };
+    case LOADING_CLIENTS_BY_RFID:
+      return { ...state, isLoadingClientByRfid: true };
+    case END_CLIENTS_BY_RFID_LOADING:
+      return { ...state, isLoadingClientByRfid: false };
     case CREATE_CLIENT:
       return { ...state, clients: [...state.clients, action.payload] };
     case UPDATE_CLIENT:

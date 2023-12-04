@@ -31,6 +31,7 @@ weights_collection = get_weights_collection()
 kg_price_collection = get_kg_price_collection()
 
 CURRENT_WEIGHT = 0
+CURRENT_BARCODE = 0
 KG_PRICE = 0
 
 # intialize the server and get the last kg price in the database
@@ -49,6 +50,7 @@ else:
 
 # Store WebSocket clients in a set
 websocket_clients = set()
+websocket_clients_rfid = set()
 
 # Function to send data to all WebSocket clients
 
@@ -74,6 +76,50 @@ async def websocket_endpoint(websocket: WebSocket):
         print(f"WebSocket connection closed with error: {e}")
     finally:
         websocket_clients.remove(websocket)
+        
+@app.websocket("/ws/rfid_to_client")
+async def websocket_endpoint_rfid(websocket: WebSocket):
+    await websocket.accept()
+    websocket_clients_rfid.add(websocket)
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            # You can process the received data here if needed.
+            await send_data_to_clients(data)
+    except Exception as e:
+        print(f"WebSocket connection closed with error: {e}")
+    finally:
+        websocket_clients_rfid.remove(websocket)
+        
+        
+@app.post("/api/registered_barcode/{barcode}", tags=["barcode"])
+async def register_rfid_of_client(barcode: str):
+    ''' API for setting the current RFID(barcode)
+    
+    Attributes:
+        barcode(str): Current barcode of the client.
+        
+    The barcode field is used to identify the current barcode of the client.
+    
+    The saving and addition of the barcode will occur in the frontend. 
+    This API receives the barcode from the Raspberry Pi, and locally saves it as the current registered user.
+    Then, it sends the barcode to the frontend, which will add it to the list of registered users and to the current transaction,
+    depending on the current state of the frontend.
+    '''
+    global CURRENT_BARCODE
+    
+    CURRENT_BARCODE = barcode
+    
+    print("CURRENT_BARCODE", CURRENT_BARCODE)
+    
+    # send the barcode to the frontend through the websocket
+    for client in websocket_clients_rfid:
+        message = {"type": "json", "message": "rfid", "value": barcode}
+        await client.send_json(message)
+    
+    return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(barcode, default=convert_object_id)))
+
 
 
 @app.post("/api/current_dish_weight/{action}/{weight}/{timestamp}", tags=["weight"])
@@ -181,6 +227,10 @@ async def create_client(client: Clients):
     if clients_collection.find_one({"cpf": client_dict["cpf"]}) is not None:
         raise HTTPException(status_code=400, detail="Client already exists")
 
+    # check if the rfid is already in use
+    if clients_collection.find_one({"rfid": client_dict["rfid"]}) is not None:
+        raise HTTPException(status_code=400, detail="RFID already in use")
+
     result = clients_collection.insert_one(client_dict)
 
     created_client = clients_collection.find_one({"_id": result.inserted_id})
@@ -201,6 +251,12 @@ async def get_client(client_id: str):
         raise HTTPException(status_code=404, detail="Client not found")
     return client_data
 
+@app.get("/api/client/rfid/{rfid}", tags=["clients"])
+async def get_client_by_rfid(rfid: str):
+    client_data = clients_collection.find_one({"rfid": rfid})
+    if client_data is None:
+        raise HTTPException(status_code=404, detail="Client not found")
+    return JSONResponse(status_code=status.HTTP_200_OK, content=json.loads(json.dumps(client_data, default=convert_object_id)))  
 
 @app.put("/api/client/{client_id}", tags=["clients"])
 async def update_client(client_id: str, client: dict):
@@ -302,7 +358,7 @@ async def clear_debt(client_ids: str):
             "client_id": client["_id"],
             "transaction_type": "clear_debt",
             "items": [],
-            "total": client["balance"] * -1,
+            "total": float(client["balance"] * -1),
             "timestamp": datetime.now().isoformat(),
             "kg_price": 0,
             "meal_price": 0,
@@ -868,6 +924,8 @@ async def create_transaction(transaction: Transaction):
     '''
 
     transaction_dict = transaction.__dict__
+    
+    print(transaction_dict)
 
     # if only rfid is provided, get client_id from rfid and update the transaction_dict with the client_id
     # if both rfid and client_id are provided, check if they match
@@ -901,6 +959,7 @@ async def create_transaction(transaction: Transaction):
     # check if items exist and if item is in stock
 
     transaction_dict["total"] = 0
+    
     for item in transaction_dict["items"]:
         item_db = items_collection.find_one({"_id": ObjectId(item["item_id"])})
         if item_db is None:
@@ -912,10 +971,12 @@ async def create_transaction(transaction: Transaction):
         # add the name and the price of the item to the transaction
         item["name"] = item_db["name"]
         item["price"] = item_db["price"]
+        
         transaction_dict["total"] += item_db["price"] * item["quantity"]
 
     # update the total price of the transaction based on the current weight of the dish
-    transaction_dict["total"] += CURRENT_WEIGHT * transaction_dict["kg_price"]
+    if (transaction_dict["weight"] is None or transaction_dict["weight"] == "" or transaction_dict["weight"] != 0):
+        transaction_dict["total"] += CURRENT_WEIGHT * transaction_dict["kg_price"]
 
     # add the weight of the dish to the transaction
     if (transaction_dict["weight"] is None or transaction_dict["weight"] == ""):
@@ -940,7 +1001,7 @@ async def create_transaction(transaction: Transaction):
 
     # update client balance
     clients_collection.update_one(
-        {"_id": ObjectId(transaction_dict["client_id"])}, {"$inc": {"balance": -transaction_dict["total"]}})
+        {"_id": ObjectId(transaction_dict["client_id"])}, {"$inc": {"balance": -float(transaction_dict["total"])}})
 
     # return transaction created
     transaction_created = transactions_collection.find_one(

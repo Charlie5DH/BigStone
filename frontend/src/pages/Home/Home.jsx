@@ -9,6 +9,13 @@ import RecordsList from "../../components/List/RecordsList";
 import Toolbar from "./components/Toolbar";
 import { Card } from "../../components";
 import { getKGPrice, updateKGPrice } from "../../actions/weight";
+import NewSaleDialog from "./components/NewSaleDialog";
+import AddProductToSaleDialog from "./components/AddProductToSaleDialog";
+import ManualTransactionDialog from "./components/ManualTransactionDialog";
+import CardsInBanner from "./components/CardsInBanner";
+import { getClientUsingRFID } from "../../actions/clients";
+import { getClientByRFID } from "../../apis";
+import NotFoundClientDialog from "./components/NotFoundClientDialog";
 
 const Home = () => {
   const options = ["24 horas", "48 horas", "Últimos 7 dias", "Últimos 30 dias"];
@@ -44,8 +51,13 @@ const Home = () => {
     timestamp: new Date().toISOString(),
   });
   const dispatch = useDispatch();
+  const [rfidValue, setRfidValue] = React.useState("");
   const [filterQuery, setFilterQuery] = React.useState(""); // filter query for items
   const [filteredItems, setFilteredItems] = React.useState([]);
+  const [client, setClient] = React.useState({});
+  const [loadingClient, setLoadingClient] = React.useState(false);
+  const [clientError, setClientError] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState("");
 
   const footerContent = (
     <div>
@@ -75,13 +87,13 @@ const Home = () => {
       getTransactions(
         "sell",
         option === "24 horas"
-          ? // at time 00:00:00
-            new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000).toISOString().split("T")[0] + "T00:00:00.000Z"
+          ? // 24 hours from now (using moment)
+            new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000).toISOString()
           : option === "48 horas"
-          ? new Date(new Date().getTime() - 2 * 24 * 60 * 60 * 1000).toISOString().split("T")[0] + "T00:00:00.000Z"
+          ? new Date(new Date().getTime() - 2 * 24 * 60 * 60 * 1000).toISOString()
           : option === "Últimos 7 dias"
-          ? new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0] + "T00:00:00.000Z"
-          : new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0] + "T00:00:00.000Z",
+          ? new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+          : new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(),
         new Date().toISOString()
       )
     );
@@ -95,21 +107,19 @@ const Home = () => {
         "sell",
         option === "24 horas"
           ? // at time 00:00:00
-            new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000).toISOString().split("T")[0] + "T00:00:00.000Z"
+            new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000).toISOString()
           : option === "48 horas"
-          ? new Date(new Date().getTime() - 2 * 24 * 60 * 60 * 1000).toISOString().split("T")[0] + "T00:00:00.000Z"
+          ? new Date(new Date().getTime() - 2 * 24 * 60 * 60 * 1000).toISOString()
           : option === "Últimos 7 dias"
-          ? new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0] + "T00:00:00.000Z"
-          : new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0] + "T00:00:00.000Z",
+          ? new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+          : new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(),
         new Date().toISOString()
       )
     );
   }, [option]);
 
   React.useEffect(() => {
-    if (transactions.length > 0) {
-      setFilteredRecords(transactions);
-    }
+    setFilteredRecords(transactions);
   }, [transactions]);
 
   React.useEffect(() => {
@@ -188,14 +198,123 @@ const Home = () => {
     };
   }, []);
 
+  React.useEffect(() => {
+    // WebSocket connection
+    const socket = new WebSocket("ws://localhost:8003/ws/rfid_to_client");
+
+    socket.onmessage = (event) => {
+      // Handle data received from WebSocket
+      const data = JSON.parse(event.data);
+      console.log(data);
+
+      if (data.message === "rfid") {
+        setRfidValue(data.value);
+      } else {
+        setRfidValue("");
+      }
+    };
+
+    // Clean up WebSocket connection on unmount
+    return () => {
+      socket.close();
+    };
+  }, []);
+
+  const fetchClient = async (rfid) => {
+    setLoadingClient(true);
+
+    try {
+      const response = await getClientByRFID(rfid);
+      setClient(response.data);
+      setClientError(false);
+      setErrorMessage("");
+
+      if (websocketData.weight !== 0 && websocketData.weight && websocketData.weight) {
+        setNewTransactionDialogVisible(true);
+      }
+
+      console.log(response);
+    } catch (error) {
+      setClient({});
+      setClientError(true);
+      setErrorMessage(error.response.data.message || "Erro ao buscar cliente");
+      console.log(error);
+    } finally {
+      setLoadingClient(false);
+      setRfidValue("");
+    }
+  };
+
+  React.useEffect(() => {
+    if (rfidValue !== "") {
+      fetchClient(rfidValue);
+    }
+  }, [rfidValue]);
+
   const handleCreateNewTransaction = () => {
     setNewTransactionDialogVisible(false);
-    dispatch(createTransaction({ ...transactionForm, weight: websocketData.weight, kg_price: kg_price }));
+
+    console.log(transactionForm);
+
+    dispatch(
+      createTransaction({
+        ...transactionForm,
+        weight: websocketData.weight,
+        kg_price: kg_price,
+        client_id: client._id,
+        rf_id: client.rfid,
+        rfid: client.rfid,
+      })
+    );
+
     setTransactionForm({
       ...transactionForm,
       kg_price: kg_price,
       items: [],
+      weight: 0,
+      client_id: "",
+      rf_id: "",
+      rfid: "",
     });
+
+    setClient({});
+    setWebsocketData({});
+  };
+
+  React.useEffect(() => {
+    setClient(client);
+    setTransactionForm({
+      ...transactionForm,
+      client_id: client._id,
+      rf_id: client.rfid,
+      rfid: client.rfid,
+    });
+  }, [client]);
+
+  const handleCreateNewManualTransaction = () => {
+    setVisibleNewManualTransaction(false);
+
+    dispatch(
+      createTransaction({
+        ...transactionForm,
+        weight: 0,
+        kg_price: kg_price,
+        client_id: client._id,
+        rf_id: client.rfid,
+        rfid: client.rfid,
+      })
+    );
+    setTransactionForm({
+      ...transactionForm,
+      kg_price: kg_price,
+      items: [],
+      weight: 0,
+      client_id: "",
+      rf_id: "",
+      rfid: "",
+    });
+    setClient({});
+    setWebsocketData({});
   };
 
   const handleFilterItems = (e) => {
@@ -247,7 +366,6 @@ const Home = () => {
   };
 
   // TODO: Adicionar paginação
-  // TODO: Enviar usuario desde raspberry
 
   return (
     <div>
@@ -278,54 +396,12 @@ const Home = () => {
           bg-white shadow-indigo-100 shadow-md rounded-md p-3 max-w-full
           overflow-x-auto mx-2 my-2 overflow-y-scroll max-h-[82vh]"
           >
-            <div className="flex flex-wrap lg:flex-nowrap items-stretch w-full lg:w-[90%] gap-2">
-              <Card
-                title={`$R ${
-                  Number(
-                    transactions
-                      .filter((row) => row.timestamp.split("T")[0] === new Date().toISOString().split("T")[0])
-                      .reduce((acc, row) => acc + row.total, 0)
-                  ).toFixed(2) || 0
-                }`}
-                subtitle={"Total do dia"}
-                titleCompare={
-                  // compare today and yesterday
-                  computeDifferenceBetweenCurrentAndPast("total") > 0
-                    ? `+${Number(computeDifferenceBetweenCurrentAndPast("total").toFixed(2))} comparado a ontem`
-                    : `${Number(computeDifferenceBetweenCurrentAndPast("total").toFixed(2))} comparado a ontem`
-                }
-                sign={"+"}
-              />
-
-              <Card
-                title={
-                  computeDifferenceBetweenCurrentAndPast("meal_price") > 0
-                    ? `+$R ${Number(computeDifferenceBetweenCurrentAndPast("meal_price")).toFixed(2)}`
-                    : `+$R ${Number(computeDifferenceBetweenCurrentAndPast("meal_price")).toFixed(2)}`
-                }
-                subtitle={"Total do dia em refeições"}
-                titleCompare={
-                  computeDifferenceBetweenCurrentAndPast("meal_price") > 0
-                    ? `+${Number(computeDifferenceBetweenCurrentAndPast("meal_price")).toFixed(2)} comparado a ontem`
-                    : `${Number(computeDifferenceBetweenCurrentAndPast("meal_price")).toFixed(2)} comparado a ontem`
-                }
-                sign={`${computeDifferenceBetweenCurrentAndPast("meal_price") > 0 ? "+" : ""}`}
-              />
-              <Card
-                title={
-                  transactions.filter((row) => row.timestamp.split("T")[0] === new Date().toISOString().split("T")[0])
-                    .length || 0
-                }
-                subtitle={"# de vendas hoje"}
-                titleCompare={
-                  computeNumeroDeVendasHoje() > 0
-                    ? `+${computeNumeroDeVendasHoje()} comparado a ontem`
-                    : `${computeNumeroDeVendasHoje()} comparado a ontem`
-                }
-                sign={"+"}
-              />
-              <Card title={`$R ${kg_price}`} subtitle={"Preço atual do KG"} />
-            </div>
+            <CardsInBanner
+              kg_price={kg_price}
+              transactions={transactions}
+              computeNumeroDeVendasHoje={computeNumeroDeVendasHoje}
+              computeDifferenceBetweenCurrentAndPast={computeDifferenceBetweenCurrentAndPast}
+            />
             <RecordsList records={filteredRecords} produtos={items} />
           </div>
 
@@ -351,451 +427,46 @@ const Home = () => {
             </div>
           </Dialog>
 
-          <Dialog
-            header="Nova venda"
-            visible={newTransactionDialogVisible}
-            style={{ width: "100%", maxWidth: "50vw" }}
-            onHide={() => setNewTransactionDialogVisible(false)}
-            footer={
-              <div className="flex justify-between items-center gap-1">
-                <button
-                  onClick={() => setViewInsertProductDialog(true)}
-                  className="bg-emerald-500 hover:bg-emerald-400 text-white text-14 font-normal 
-                  py-2 px-3 rounded-md duration-200 shadow-md shadow-emerald-200 active:scale-95
-                  animate-pulse"
-                >
-                  + Adicionar produtos
-                </button>
-                <div className="flex justify-end items-center gap-1">
-                  <button
-                    onClick={() => setNewTransactionDialogVisible(false)}
-                    className="bg-white hover:bg-red-400 hover:text-white text-slate-500 text-14 font-normal 
-        py-2 px-3 rounded-md border duration-200 shadow-sm shadow-indigo-200 active:scale-95"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={() => handleCreateNewTransaction()}
-                    className="bg-indigo-500 hover:bg-indigo-400 text-white text-14 font-normal 
-                  py-2 px-3 rounded-md duration-200 shadow-md shadow-indigo-200 active:scale-95"
-                  >
-                    Confirmar
-                  </button>
-                </div>
-              </div>
-            }
-          >
-            <div className="flex flex-col items-center border rounded-md w-full my-3">
-              <div className="grid grid-cols-4 w-full items-center justify-between p-2 bg-slate-100">
-                <div className="flex items-center justify-center gap-1 text-slate-500 mb-4">
-                  <span className="text-[13px] font-normal">Cliente</span>
-                </div>
-                <div className="flex items-center justify-center gap-1 text-slate-500 border-l mb-4">
-                  <span className="text-[13px] font-normal">Peso registrado</span>
-                </div>
-                <div className="flex items-center justify-center gap-1 text-slate-500 border-l mb-4">
-                  <span className="text-[13px] font-normal">Valor atual do Kg</span>
-                </div>
-                <div className="flex items-center justify-center gap-1 text-slate-500 border-l mb-4">
-                  <span className="text-[13px] font-normal">Valor a pagar por prato</span>
-                </div>
+          <NewSaleDialog
+            client={client}
+            items={items}
+            kg_price={kg_price}
+            setClient={setClient}
+            websocketData={websocketData}
+            transactionForm={transactionForm}
+            setWebsocketData={setWebsocketData}
+            setTransactionForm={setTransactionForm}
+            newTransactionDialogVisible={newTransactionDialogVisible}
+            setNewTransactionDialogVisible={setNewTransactionDialogVisible}
+            setViewInsertProductDialog={setViewInsertProductDialog}
+            handleCreateNewTransaction={handleCreateNewTransaction}
+          />
 
-                <div className="flex items-center justify-center gap-1 text-slate-500">
-                  <span className="text-16 font-semibold">client name</span>
-                </div>
+          <AddProductToSaleDialog
+            filterQuery={filterQuery}
+            filteredItems={filteredItems}
+            transactionForm={transactionForm}
+            handleFilterItems={handleFilterItems}
+            setTransactionForm={setTransactionForm}
+            viewInsertProductDialog={viewInsertProductDialog}
+            setViewInsertProductDialog={setViewInsertProductDialog}
+            handleAddItemToTransactionForm={handleAddItemToTransactionForm}
+            handleRemoveItemFromTransactionForm={handleRemoveItemFromTransactionForm}
+          />
 
-                <div className="flex items-center justify-center gap-1 text-slate-500">
-                  <span className="text-16 font-semibold">{websocketData.weight} Kg</span>
-                </div>
-
-                <div className="flex items-center justify-center gap-1 text-slate-500">
-                  <span className="text-16 font-semibold">R$ {kg_price}</span>
-                </div>
-
-                <div className="flex items-center justify-center gap-1 text-slate-500">
-                  <span className="text-16 font-semibold">R$ {Number(websocketData.weight * kg_price).toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-
-            {transactionForm.items.length > 0 ? (
-              <div className="flex flex-col gap-y-1 px-3 py-2 duration-200">
-                <span className="text-14 font-medium text-slate-700">Produtos adicionados</span>
-                <div className="flex flex-col items-center border rounded-md w-full my-1">
-                  <div className="grid grid-cols-6 w-full items-center justify-between p-3 bg-slate-100">
-                    <div className="flex items-start col-span-2 lg:col-span-3 xl:col-span-3">
-                      <span className="flex items-center gap-2 text-[13px] font-normal text-slate-500">Nome</span>
-                    </div>
-
-                    <div
-                      className="lg:flex hidden items-center justify-center gap-1 text-slate-500
-           hover:text-slate-400 duration-200 cursor-pointer border-l"
-                    >
-                      <span className="text-[13px] font-normal">Preço</span>
-                    </div>
-
-                    <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l">
-                      <span className="text-[13px] font-normal">Quantidade adicionada</span>
-                    </div>
-
-                    <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l">
-                      <span className="text-[13px] font-normal">Valor total</span>
-                    </div>
-                  </div>
-
-                  {transactionForm.items.length > 0 &&
-                    transactionForm.items.map((item, index) => (
-                      <div
-                        key={index}
-                        className="grid grid-cols-6 w-full items-center justify-between p-3 bg-slate-100 border-t"
-                      >
-                        <div className="flex items-start col-span-2 lg:col-span-3 xl:col-span-3">
-                          <div className="flex items-center">
-                            <img
-                              src={`http://localhost:8003/api/get_image/${
-                                items.find((produto) => produto._id === item.item_id).image
-                              }`} //"https://placehold.co/600x400" ||
-                              alt="item"
-                              className="rounded-md shadow-sm w-16 h-16 object-cover"
-                            />
-                            <div className="flex flex-col gap-y-1 ml-4">
-                              <span className="text-14 font-medium text-slate-700">{item.name}</span>
-                              <span className="text-12 font-normal text-slate-500">
-                                {items.find((produto) => produto._id === item.item_id).description}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l">
-                          <span className="text-12 font-medium text-slate-500">
-                            $R {items.find((produto) => produto._id === item.item_id).price}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l">
-                          <span className="text-12 font-medium text-slate-500">{item.quantity}</span>
-                        </div>
-
-                        <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l">
-                          <span className="text-12 font-medium text-slate-500">
-                            $R{" "}
-                            {Number(
-                              item.quantity * items.find((produto) => produto._id === item.item_id).price
-                            ).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1 text-slate-500 mt-4">
-                <span className="text-16 font-normal">Nenhum produto adicionado</span>
-              </div>
-            )}
-            <div className="flex flex-col gap-y-2 mt-4">
-              <span className="text-14 font-medium text-slate-700">
-                Total em produtos: $R{" "}
-                {transactionForm.items.reduce(
-                  (acc, item) => acc + item.quantity * items.find((produto) => produto._id === item.item_id).price,
-                  0
-                ) || 0}
-              </span>
-              <span className="text-16 font-medium text-slate-700 mt-2">
-                Total: $R{" "}
-                {(
-                  Number(websocketData.weight * kg_price) +
-                  Number(
-                    transactionForm.items.reduce(
-                      (acc, item) => acc + item.quantity * items.find((produto) => produto._id === item.item_id).price,
-                      0
-                    )
-                  )
-                ).toFixed(2) || 0}
-              </span>
-            </div>
-          </Dialog>
-
-          <Dialog
-            header="Adicionar produtos ao pedido"
-            visible={viewInsertProductDialog}
-            style={{ width: "50vw" }}
-            onHide={() => setViewInsertProductDialog(false)}
-          >
-            <div className="flex items-center justify-between w-full mb-2 gap-1">
-              <input
-                className="relative w-1/2 h-10 cursor-text text-left font-light sm:text-14 dark:bg-secondary-dark-bg dark:text-white
-              focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
-              focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
-                name="filter_object"
-                type="text"
-                value={filterQuery}
-                onChange={(e) => handleFilterItems(e)}
-                placeholder={`filtrar produtos por nome`}
-                autoComplete="off"
-              ></input>
-
-              <button
-                onClick={() => {
-                  // clean transaction form items
-                  setTransactionForm({
-                    ...transactionForm,
-                    items: [],
-                  });
-                }}
-                className="bg-white hover:bg-indigo-400 hover:text-white text-slate-500 text-14 font-normal
-              py-2 px-3 rounded-md border duration-200 shadow-sm shadow-indigo-200 active:scale-95"
-              >
-                Limpar produtos adicionados
-              </button>
-            </div>
-
-            {transactionForm.items.length > 0 ? (
-              <div className="flex flex-wrap items-center w-full mb-2 gap-1 border rounded-md p-3">
-                {transactionForm.items.map((item) => (
-                  <div key={item.name} className="flex items-center px-3 py-1 border rounded-md bg-slate-50">
-                    <span className="flex items-center gap-2 text-[13px] font-normal text-slate-500">{item.name}:</span>
-                    <span className="flex items-center gap-2 text-[13px] font-semibold text-slate-600 ml-4">
-                      {item.quantity}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-wrap items-center w-full mb-2 gap-1 border rounded-md p-3">
-                <span className="flex items-center gap-2 px-3 py-1 text-[13px] font-normal text-slate-500">
-                  Nenhum produto adicionado
-                </span>
-              </div>
-            )}
-
-            <div className="flex flex-col w-full gap-y-1 max-h-[620px] overflow-y-scroll">
-              <div className="flex flex-col items-center border rounded-md w-full my-1">
-                <div className="grid grid-cols-6 w-full items-center justify-between p-3 bg-slate-100">
-                  <div className="flex items-start col-span-2 lg:col-span-3 xl:col-span-3">
-                    <span className="flex items-center gap-2 text-[13px] font-normal text-slate-500">Nome</span>
-                  </div>
-
-                  <div
-                    className="lg:flex hidden items-center justify-center gap-1 text-slate-500
-           hover:text-slate-400 duration-200 cursor-pointer border-l"
-                  >
-                    <span className="text-[13px] font-normal">Preço</span>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l">
-                    <span className="text-[13px] font-normal">Disponível</span>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l">
-                    <span className="text-[13px] font-normal">Ações</span>
-                  </div>
-                </div>
-                {filteredItems.map((produto, index) => (
-                  <div key={index} className="grid grid-cols-6 w-full items-center justify-between p-2 border-t">
-                    <div className="flex items-start col-span-3 p-1">
-                      <div className="flex flex-nowrap items-center">
-                        <img
-                          src={`http://localhost:8003/api/get_image/${produto.image}`} //"https://placehold.co/600x400" ||
-                          alt="produto"
-                          className="rounded-md shadow-sm w-12 h-12 object-cover"
-                        />
-                        <div className="flex flex-col gap-y-1 ml-4">
-                          <span className="text-14 font-medium text-slate-700">{produto.name}</span>
-                          <span className="text-12 font-normal text-slate-500">{produto.description}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="lg:flex hidden items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l">
-                      <span className="text-14 font-normal text-slate-500">$R {produto.price}</span>
-                    </div>
-                    <div className="lg:flex hidden items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l">
-                      <span className="text-14 font-normal text-slate-500">{produto.quantity}</span>
-                    </div>
-                    <div className="lg:flex hidden items-center justify-center gap-1 text-slate-500hover:text-slate-400 duration-200 border-l">
-                      <button
-                        onClick={() => handleAddItemToTransactionForm(produto)}
-                        className="text-slate-100 font-display font-semibold text-14 w-7 h-7 rounded-md hover:scale-105 duration-150 border bg-emerald-500 active:scale-95"
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => handleRemoveItemFromTransactionForm(produto)}
-                        className="text-slate-100 font-display font-semibold text-14 w-7 h-7 rounded-md hover:scale-105 duration-150 border bg-slate-500 active:scale-95"
-                      >
-                        -
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Dialog>
-
-          <Dialog
-            header="Nova venda"
-            visible={visibleNewManualTransaction}
-            style={{ width: "100%", maxWidth: "50vw" }}
-            onHide={() => setVisibleNewManualTransaction(false)}
-            footer={
-              <div className="flex justify-between items-center gap-1">
-                <button
-                  onClick={() => setViewInsertProductDialog(true)}
-                  className="bg-emerald-500 hover:bg-emerald-400 text-white text-14 font-normal 
-                  py-2 px-3 rounded-md duration-200 shadow-md shadow-emerald-200 active:scale-95
-                  animate-pulse"
-                >
-                  + Adicionar produtos
-                </button>
-                <div className="flex justify-end items-center gap-1">
-                  <button
-                    onClick={() => setVisibleNewManualTransaction(false)}
-                    className="bg-white hover:bg-red-400 hover:text-white text-slate-500 text-14 font-normal 
-        py-2 px-3 rounded-md border duration-200 shadow-sm shadow-indigo-200 active:scale-95"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={() => handleCreateNewTransaction()}
-                    className="bg-indigo-500 hover:bg-indigo-400 text-white text-14 font-normal 
-                  py-2 px-3 rounded-md duration-200 shadow-md shadow-indigo-200 active:scale-95"
-                  >
-                    Confirmar
-                  </button>
-                </div>
-              </div>
-            }
-          >
-            <div className="flex flex-col items-center border rounded-md w-full my-3">
-              <div className="grid grid-cols-4 w-full items-center justify-between p-2 bg-slate-100">
-                <div className="flex items-center justify-center gap-1 text-slate-500 mb-4">
-                  <span className="text-[13px] font-normal">Cliente</span>
-                </div>
-                <div className="flex items-center justify-center gap-1 text-slate-500 border-l mb-4">
-                  <span className="text-[13px] font-normal">Peso registrado</span>
-                </div>
-                <div className="flex items-center justify-center gap-1 text-slate-500 border-l mb-4">
-                  <span className="text-[13px] font-normal">Valor atual do Kg</span>
-                </div>
-                <div className="flex items-center justify-center gap-1 text-slate-500 border-l mb-4">
-                  <span className="text-[13px] font-normal">Valor a pagar por prato</span>
-                </div>
-
-                <div className="flex items-center justify-center gap-1 text-slate-500">
-                  <span className="text-16 font-semibold">client name</span>
-                </div>
-
-                <div className="flex items-center justify-center gap-1 text-slate-500">
-                  <span className="text-16 font-semibold">{websocketData.weight} Kg</span>
-                </div>
-
-                <div className="flex items-center justify-center gap-1 text-slate-500">
-                  <span className="text-16 font-semibold">R$ {kg_price}</span>
-                </div>
-
-                <div className="flex items-center justify-center gap-1 text-slate-500">
-                  <span className="text-16 font-semibold">R$ {Number(websocketData.weight * kg_price).toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-
-            {transactionForm.items.length > 0 ? (
-              <div className="flex flex-col gap-y-1 px-3 py-2 duration-200">
-                <span className="text-14 font-medium text-slate-700">Produtos adicionados</span>
-                <div className="flex flex-col items-center border rounded-md w-full my-1">
-                  <div className="grid grid-cols-6 w-full items-center justify-between p-3 bg-slate-100">
-                    <div className="flex items-start col-span-2 lg:col-span-3 xl:col-span-3">
-                      <span className="flex items-center gap-2 text-[13px] font-normal text-slate-500">Nome</span>
-                    </div>
-
-                    <div
-                      className="lg:flex hidden items-center justify-center gap-1 text-slate-500
-           hover:text-slate-400 duration-200 cursor-pointer border-l"
-                    >
-                      <span className="text-[13px] font-normal">Preço</span>
-                    </div>
-
-                    <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l">
-                      <span className="text-[13px] font-normal">Quantidade adicionada</span>
-                    </div>
-
-                    <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 cursor-pointer border-l">
-                      <span className="text-[13px] font-normal">Valor total</span>
-                    </div>
-                  </div>
-
-                  {transactionForm.items.length > 0 &&
-                    transactionForm.items.map((item, index) => (
-                      <div
-                        key={index}
-                        className="grid grid-cols-6 w-full items-center justify-between p-3 bg-slate-100 border-t"
-                      >
-                        <div className="flex items-start col-span-2 lg:col-span-3 xl:col-span-3">
-                          <div className="flex items-center">
-                            <img
-                              src={`http://localhost:8003/api/get_image/${
-                                items.find((produto) => produto._id === item.item_id).image
-                              }`} //"https://placehold.co/600x400" ||
-                              alt="item"
-                              className="rounded-md shadow-sm w-16 h-16 object-cover"
-                            />
-                            <div className="flex flex-col gap-y-1 ml-4">
-                              <span className="text-14 font-medium text-slate-700">{item.name}</span>
-                              <span className="text-12 font-normal text-slate-500">
-                                {items.find((produto) => produto._id === item.item_id).description}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l">
-                          <span className="text-12 font-medium text-slate-500">
-                            $R {items.find((produto) => produto._id === item.item_id).price}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l">
-                          <span className="text-12 font-medium text-slate-500">{item.quantity}</span>
-                        </div>
-
-                        <div className="flex items-center justify-center gap-1 text-slate-500 hover:text-slate-400 duration-200 border-l">
-                          <span className="text-12 font-medium text-slate-500">
-                            $R{" "}
-                            {Number(
-                              item.quantity * items.find((produto) => produto._id === item.item_id).price
-                            ).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1 text-slate-500 mt-4">
-                <span className="text-16 font-normal">Nenhum produto adicionado</span>
-              </div>
-            )}
-            <div className="flex flex-col gap-y-2 mt-4">
-              <span className="text-14 font-medium text-slate-700">
-                Total em produtos: $R{" "}
-                {transactionForm.items.reduce(
-                  (acc, item) => acc + item.quantity * items.find((produto) => produto._id === item.item_id).price,
-                  0
-                ) || 0}
-              </span>
-              <span className="text-16 font-medium text-slate-700 mt-2">
-                Total: $R{" "}
-                {(
-                  Number(websocketData.weight * kg_price) +
-                  Number(
-                    transactionForm.items.reduce(
-                      (acc, item) => acc + item.quantity * items.find((produto) => produto._id === item.item_id).price,
-                      0
-                    )
-                  )
-                ).toFixed(2) || 0}
-              </span>
-            </div>
-          </Dialog>
+          <ManualTransactionDialog
+            items={items}
+            client={client}
+            setClient={setClient}
+            kg_price={kg_price}
+            websocketData={websocketData}
+            transactionForm={transactionForm}
+            setTransactionForm={setTransactionForm}
+            handleCreateNewManualTransaction={handleCreateNewManualTransaction}
+            setViewInsertProductDialog={setViewInsertProductDialog}
+            visibleNewManualTransaction={visibleNewManualTransaction}
+            setVisibleNewManualTransaction={setVisibleNewManualTransaction}
+          />
         </div>
       )}
     </div>

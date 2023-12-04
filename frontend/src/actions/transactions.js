@@ -17,6 +17,7 @@ export const getTransactions = (transaction_type, start_timestamp, end_timestamp
   try {
     dispatch({ type: LOADING_TRANSACTIONS });
     const { data } = await api.getTransactions(transaction_type, start_timestamp, end_timestamp);
+    console.log(data);
     dispatch({ type: GET_TRANSACTIONS, payload: data });
     dispatch({ type: END_LOADING_TRANSACTIONS });
   } catch (error) {

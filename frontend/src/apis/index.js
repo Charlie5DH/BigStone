@@ -35,6 +35,7 @@ export const getTransactionsSummaryByClient = (client_id, period) =>
 
 export const getClients = () => CLIENT_API.get("/clients");
 export const getClientById = (id) => CLIENT_API.get(`/client/${id}`);
+export const getClientByRFID = (rfid) => CLIENT_API.get(`/client/rfid/${rfid}`);
 export const postClient = (newClient) => CLIENT_API.post("/create_clients", newClient);
 export const updateClient = (id, updatedClient) => CLIENT_API.put(`/client/${id}`, updatedClient);
 export const clearDebtOfClients = (ids) => CLIENT_API.put(`/clients/clear_debt/${ids}`);

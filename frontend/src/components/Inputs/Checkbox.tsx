@@ -39,8 +39,8 @@ const Checkbox = ({
         )}
       </div>
       <div
-        className={`${disabled ? "text-gray-400" : "text-gray-500"} dark:text-gray-400 ${font} ${
-          size === "normal" ? "text-14" : "text-12"
+        className={`${disabled ? "text-gray-400" : "font-normal text-slate-500"} dark:text-gray-400 ${font} ${
+          size === "normal" ? "text-14" : "text-[13px]"
         }`}
       >
         {label}

@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
-import React from "react";
+import React, { useRef } from "react";
 import { GenericButton, Input } from "../../../components";
 import { AiOutlineSearch } from "react-icons/ai";
 import { Dropdown } from "primereact/dropdown";
-import { createClient } from "../../../actions/clients";
 import { Dialog } from "primereact/dialog";
-import { useDispatch } from "react-redux";
+import { postClient } from "../../../apis";
+import { Toast } from "primereact/toast";
 
 const createRandomCPF = () => {
   let cpf = "";
@@ -15,19 +15,27 @@ const createRandomCPF = () => {
   return cpf;
 };
 
+const groups = [
+  { name: "Estudante", code: "ES" },
+  { name: "Professor", code: "Pfr" },
+  { name: "Regular", code: "RG" },
+];
+
 const Toolbar = () => {
   const [selectedClientOption, setSelectedClientOption] = React.useState(null);
   const [inputTextFilter, setInputTextFilter] = React.useState("");
   const [visibleClientDialog, setVisibleClientDialog] = React.useState(false);
-  const dispatch = useDispatch();
+  const [rfidValue, setRfidValue] = React.useState("");
+  const toast = useRef(null);
+
   const [formData, setFormData] = React.useState({
-    name: "",
-    email: "",
+    name: "RasPy2",
+    email: "raspberrypi@email.com",
     cpf: createRandomCPF(),
     phone: "(48)99-987-1234",
     address: "Rua XXX, 123",
-    group: "regular",
-    cep: "",
+    group: groups[2].name,
+    cep: "79311-571",
     balance: 0,
     rfid: "",
   });
@@ -35,6 +43,28 @@ const Toolbar = () => {
   // React.useEffect(() => {
   //   setFormData({ ...formData, cpf: createRandomCPF() });
   // }, [visibleClientDialog]);
+
+  React.useEffect(() => {
+    // WebSocket connection
+    const socket = new WebSocket("ws://localhost:8003/ws/rfid_to_client");
+
+    socket.onmessage = (event) => {
+      // Handle data received from WebSocket
+      const data = JSON.parse(event.data);
+      console.log(data);
+
+      if (data.message === "rfid") {
+        setRfidValue(data.value);
+      } else {
+        setRfidValue("");
+      }
+    };
+
+    // Clean up WebSocket connection on unmount
+    return () => {
+      socket.close();
+    };
+  }, []);
 
   const clientesOptions = [
     { name: "Todos", code: "all" },
@@ -82,13 +112,32 @@ const Toolbar = () => {
     </div>
   );
 
-  const handleNewClient = () => {
+  const handleNewClient = async () => {
     setVisibleClientDialog(false);
 
-    dispatch(createClient(formData));
+    //axios try catch await block
+    try {
+      const response = await postClient({
+        name: formData.name,
+        email: formData.email,
+        cpf: formData.cpf,
+        phone: formData.phone,
+        address: formData.address,
+        group: formData.group.name,
+        cep: formData.cep,
+        balance: formData.balance,
+        rfid: rfidValue,
+      });
+      console.log("response", response);
+      showSuccess(formData.name);
+    } catch (error) {
+      console.log("error", error);
+      showError(error?.response?.data?.detail);
+    }
+
     setFormData({
-      name: "Novo Cliente",
-      email: "nomedocliente@exemplo.com",
+      name: "RasPy2",
+      email: "raspberrypi@email.com",
       cpf: createRandomCPF(),
       phone: "(48)99-987-1234",
       address: "Rua XXX, 123",
@@ -97,12 +146,24 @@ const Toolbar = () => {
       balance: 0,
       rfid: "",
     });
+    setRfidValue("");
   };
+
+  const showSuccess = (name) => {
+    toast.current.show({ severity: "success", summary: "Cliente criado", detail: name, life: 3000 });
+  };
+
+  const showError = (errorMessage) => {
+    toast.current.show({ severity: "error", summary: "Error", detail: errorMessage, life: 3000 });
+  };
+
+  console.log(formData);
 
   return (
     <div className="flex items-center bg-white h-full max-h-40 w-full rounded-b-md border p-3 shadow-sm">
       <div className="flex flex-wrap gap-2 items-center justify-between w-full">
         <div className="flex flex-wrap items-center gap-3">
+          <Toast ref={toast} />
           <Input
             value={inputTextFilter}
             icon={<AiOutlineSearch className="text-slate-500 text-20 mr-2" />}
@@ -225,17 +286,16 @@ const Toolbar = () => {
 
             <div className="flex flex-col w-full mx-1">
               <span className="text-14 text-gray-500 font-normal">Grupo</span>
-              <input
-                className="relative w-full h-10 cursor-text text-left font-normal sm:text-14 dark:bg-secondary-dark-bg dark:text-white
-              focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
-              focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
-                name="group"
-                type="text"
+              <Dropdown
                 value={formData.group}
-                onChange={(e) => setFormData({ ...formData, group: e.target.value })}
-                placeholder={`regular`}
-                autoComplete="off"
-              ></input>
+                onChange={(e) => setFormData({ ...formData, group: e.value })}
+                options={groups}
+                optionLabel="name"
+                placeholder="Selecione o grupo"
+                className="relative w-full h-10 cursor-text text-left font-normal sm:text-14 dark:bg-secondary-dark-bg dark:text-white
+    focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
+    focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
+              />
             </div>
 
             <div className="flex flex-col w-full mx-1">
@@ -275,8 +335,8 @@ const Toolbar = () => {
               focus:outline-none bg-inherit focus-visible:border-1 focus-visible:ring-1 focus-visible:ring-white 
               focus-visible:ring-opacity-75 focus-visible:ring-offset-0 px-2 border rounded-md"
                 name="rfid"
-                value={formData.rfid}
-                onChange={(e) => setFormData({ ...formData, rfid: e.target.value })}
+                value={rfidValue}
+                onChange={(e) => setRfidValue(e.target.value)}
                 placeholder={`rfid do cartão do cliente`}
                 autoComplete="off"
               ></textarea>
